@@ -207,9 +207,7 @@ export default function Home() {
         rows={rows}
       />
 
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-        <AboutButton />
-      </Box>
+      <AboutButton />
 
       <SuccessSnackbar onClose={handleCloseSuccessSnackbar} open={openSuccessSnackbar} />
     </Container>

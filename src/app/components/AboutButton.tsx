@@ -1,9 +1,9 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
   Divider,
   IconButton,
   Link,
@@ -21,7 +21,7 @@ export const AboutButton = () => {
   const handleOpen = () => setOpen(true)
 
   return (
-    <>
+    <Box sx={{ position: 'fixed', bottom: { xs: 11, sm: 15 }, left: '50%', transform: 'translateX(-50%)' }}>
       <IconButton
         aria-label="About"
         onClick={handleOpen}
@@ -71,6 +71,6 @@ export const AboutButton = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </Box>
   )
 }
