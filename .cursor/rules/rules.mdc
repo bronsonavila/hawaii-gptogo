@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- Use `pnpm`.
+- Avoid using abbreviations (e.g., say `error` or `event`, not `e`).
+- Don't use the `any` type.
+- Order all code elements alphabetically, unless there's a strongly compelling reason to do otherwise.
+- Add newline gaps between components and logical blocks of code to allow for easier reading.
+- Don't delete extra spaces that have already been added.
+- Don't wait to be micromanaged; always apply your proposed changes.

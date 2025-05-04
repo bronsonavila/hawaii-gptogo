@@ -1,0 +1,78 @@
+import { Box, CircularProgress, TextField, IconButton, Tooltip } from '@mui/material'
+import TravelExploreIcon from '@mui/icons-material/TravelExplore'
+import { GridFooterContainer } from '@mui/x-data-grid'
+import { usePersistentState } from '@/hooks/usePersistentState'
+import React from 'react'
+
+// Types
+
+interface AnalyzeButtonProps {
+  disabled: boolean
+  loading: boolean
+  onClick: () => void
+}
+
+interface CustomFooterProps {
+  disabled: boolean
+  loading: boolean
+  onAnalyze: (drivingPlan: string) => void
+}
+
+// Components
+
+const AnalyzeButton = ({ disabled, loading, onClick }: AnalyzeButtonProps) => (
+  <span>
+    <IconButton color="primary" disabled={disabled} onClick={onClick} sx={{ height: 40, width: 40 }}>
+      {loading ? <CircularProgress size={24} color="inherit" /> : <TravelExploreIcon />}
+    </IconButton>
+  </span>
+)
+
+export const Footer = ({ disabled, loading, onAnalyze }: CustomFooterProps) => {
+  const [drivingPlan, setDrivingPlan] = usePersistentState<string>('drivingPlan', '')
+
+  const isButtonDisabled = disabled || loading || !drivingPlan.trim()
+
+  const handleAnalyzeClick = () => {
+    if (drivingPlan.trim()) onAnalyze(drivingPlan)
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+
+      handleAnalyzeClick()
+    }
+  }
+
+  return (
+    <GridFooterContainer>
+      <Box
+        sx={{
+          alignItems: 'center',
+          borderColor: 'divider',
+          borderTop: 1,
+          display: 'flex',
+          gap: 1,
+          justifyContent: 'flex-end',
+          p: 1,
+          width: '100%'
+        }}
+      >
+        <TextField
+          autoComplete="off"
+          disabled={disabled || loading}
+          fullWidth
+          label="Enter your planned route"
+          onChange={e => setDrivingPlan(e.target.value)}
+          onKeyDown={handleKeyDown}
+          size="small"
+          value={drivingPlan}
+          variant="outlined"
+        />
+
+        <AnalyzeButton disabled={isButtonDisabled} loading={loading} onClick={handleAnalyzeClick} />
+      </Box>
+    </GridFooterContainer>
+  )
+}
