@@ -46,7 +46,7 @@ export const Footer = ({ disabled, loading, onAnalyze }: CustomFooterProps) => {
   }
 
   return (
-    <GridFooterContainer>
+    <GridFooterContainer sx={{ backgroundColor: theme => theme.palette.grey[900] }}>
       <Box
         sx={{
           alignItems: 'center',
@@ -67,6 +67,7 @@ export const Footer = ({ disabled, loading, onAnalyze }: CustomFooterProps) => {
           onChange={e => setDrivingPlan(e.target.value)}
           onKeyDown={handleKeyDown}
           size="small"
+          sx={{ backgroundColor: theme => theme.palette.background.paper }}
           value={drivingPlan}
           variant="outlined"
         />
