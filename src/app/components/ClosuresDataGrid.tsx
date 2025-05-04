@@ -238,7 +238,6 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
             rowHeight={72}
             rows={rows}
             sx={{
-              '& .MuiDataGrid-columnHeaderRow': { backgroundColor: theme => theme.palette.grey[900] },
               '& .MuiDataGrid-footerContainer .MuiBox-root': { borderTop: 'none' },
               '& .MuiDataGrid-footerContainer': { minHeight: 64 },
               '& .highlighted-row': { backgroundColor: theme => alpha(theme.palette.info.light, 0.3) },
@@ -260,11 +259,7 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
                 WebkitLineClamp: '3',
                 whiteSpace: 'pre-line !important'
               },
-              '& .MuiDataGrid-columnHeader': {
-                alignItems: 'flex-start',
-                backgroundColor: theme => theme.palette.grey[900],
-                pt: 1
-              }
+              '& .MuiDataGrid-columnHeader': { alignItems: 'flex-start', pt: 1 }
             }}
             slots={{
               footer: () => (
