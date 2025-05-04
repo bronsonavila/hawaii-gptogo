@@ -236,9 +236,7 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
 
   return (
     <Box>
-      {rows.length === 0 ? (
-        <Typography sx={{ mt: 2 }}>No active lane closures found for {island}.</Typography>
-      ) : (
+      {rows.length === 0 ? null : (
         <Box ref={gridRef} sx={{ height: gridHeight, width: '100%' }}>
           <DataGrid<GridRowData>
             columns={columns}

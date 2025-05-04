@@ -7,6 +7,7 @@ import { ClosuresDataGrid, GridRowData } from './components/ClosuresDataGrid'
 import { DateFormatSeparator, formatDate } from '@/utils/dateUtils'
 import { fetchClosures, ClosureFeature } from '@/api/fetchClosures'
 import { SelectChangeEvent } from '@mui/material/Select'
+import { Skeleton } from '@mui/material'
 import { SuccessSnackbar } from './components/SuccessSnackbar'
 import { usePersistentState } from '@/hooks/usePersistentState'
 import { useState, useEffect, useMemo, useCallback } from 'react'
@@ -200,7 +201,14 @@ export default function Home() {
       </Typography>
 
       <Typography color="text.secondary" variant="subtitle1" gutterBottom>
-        Closures active within the next 24 hours.
+        {loadingClosures ? (
+          <Skeleton animation="wave" variant="text" width="300px" />
+        ) : (
+          <>
+            {rows.length === 0 ? 'No closures' : `${rows.length} ${rows.length === 1 ? 'closure' : 'closures'}`}
+            {' active within the next 24 hours.'}
+          </>
+        )}
       </Typography>
 
       {error && (
