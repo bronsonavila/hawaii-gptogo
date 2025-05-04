@@ -89,8 +89,8 @@ const getColumns = (
     width: 130,
     valueGetter: (_: any, row: GridRowData) => `${row.Route || 'N/A'}\nDirection: ${row.direct || 'N/A'}`
   },
-  { field: 'intsfroml', headerName: 'From', disableColumnMenu: true, flex: 1, minWidth: 150 },
-  { field: 'intstol', headerName: 'To', disableColumnMenu: true, flex: 1, minWidth: 150 },
+  { field: 'intsfroml', headerName: 'From', disableColumnMenu: true, flex: 1, minWidth: 160 },
+  { field: 'intstol', headerName: 'To', disableColumnMenu: true, flex: 1, minWidth: 160 },
   {
     field: 'lanesAffected',
     headerName: 'Lanes Affected',
@@ -105,14 +105,14 @@ const getColumns = (
     field: 'beginDate',
     headerName: 'Starts',
     disableColumnMenu: true,
-    width: 110,
+    width: 100,
     valueFormatter: (value: number | null) => formatDate(value)
   },
   {
     field: 'enDate',
     headerName: 'Ends',
     disableColumnMenu: true,
-    width: 110,
+    width: 100,
     valueFormatter: (value: number | null) => formatDate(value)
   },
   { field: 'ClosReason', headerName: 'Reason', disableColumnMenu: true },
@@ -121,14 +121,14 @@ const getColumns = (
     headerName: 'Details',
     disableColumnMenu: true,
     flex: 1.5,
-    minWidth: 220
+    minWidth: 250
   },
   {
     field: 'Remarks',
     headerName: 'Remarks',
     disableColumnMenu: true,
-    flex: 2,
-    minWidth: 220
+    flex: 2.75,
+    minWidth: 250
   }
 ]
 
@@ -226,6 +226,7 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
             disableColumnSelector
             disableDensitySelector
             disableRowSelectionOnClick
+            disableVirtualization
             getRowClassName={getRowClassName}
             hideFooterPagination
             initialState={{
