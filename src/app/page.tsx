@@ -1,13 +1,14 @@
 'use client'
 
-import { Alert, Box, Container, MenuItem, Select, Typography } from '@mui/material'
-import { ClosuresDataGrid, GridRowData } from './components/ClosuresDataGrid'
 import { AboutButton } from './components/AboutButton'
+import { Alert, Box, Container, MenuItem, Select, Typography } from '@mui/material'
 import { analyzeDrivingPlan, ImpactedClosure } from '@/api/analyzeDrivingPlan'
-import { fetchClosures, ClosureFeature } from '@/api/fetchClosures'
+import { ClosuresDataGrid, GridRowData } from './components/ClosuresDataGrid'
 import { DateFormatSeparator, formatDate } from '@/utils/dateUtils'
+import { fetchClosures, ClosureFeature } from '@/api/fetchClosures'
 import { SelectChangeEvent } from '@mui/material/Select'
 import { SuccessSnackbar } from './components/SuccessSnackbar'
+import { usePersistentState } from '@/hooks/usePersistentState'
 import { useState, useEffect, useMemo, useCallback } from 'react'
 
 // Constants
@@ -23,6 +24,7 @@ const getFormattedDatePrefix = (): string => {
     month: 'numeric',
     day: 'numeric'
   })
+
   return `Today's date is ${formattedDate}. `
 }
 
@@ -32,9 +34,10 @@ export default function Home() {
   const [analysisResults, setAnalysisResults] = useState<ImpactedClosure[]>([])
   const [closures, setClosures] = useState<ClosureFeature[]>([])
   const [error, setError] = useState<string | null>(null)
-  const [island, setIsland] = useState<string>('Oahu')
-  const [loadingClosures, setLoadingClosures] = useState<boolean>(true)
+  const [island, setIsland] = usePersistentState<string>('island', 'Oahu')
+  const [isMounted, setIsMounted] = useState<boolean>(false)
   const [loadingAnalysis, setLoadingAnalysis] = useState<boolean>(false)
+  const [loadingClosures, setLoadingClosures] = useState<boolean>(true)
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState<boolean>(false)
 
   const analysisResultsMap = useMemo(() => {
@@ -76,28 +79,6 @@ export default function Home() {
     [closures]
   )
 
-  useEffect(() => {
-    ;(async () => {
-      setAnalysisResults([])
-      setClosures([])
-      setError(null)
-      setLoadingClosures(true)
-      setOpenSuccessSnackbar(false)
-
-      try {
-        const fetchedClosures = await fetchClosures(island)
-
-        setClosures(fetchedClosures)
-      } catch (error: unknown) {
-        setError(error instanceof Error ? error.message : 'An unknown error occurred')
-
-        console.error('Error fetching closures:', error)
-      } finally {
-        setLoadingClosures(false)
-      }
-    })()
-  }, [island])
-
   const handleCloseSuccessSnackbar = (_?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return
 
@@ -138,6 +119,38 @@ export default function Home() {
     },
     [closureInfoForApi]
   )
+
+  useEffect(() => {
+    // This ensures the component only renders client-side after hydration,
+    // preventing fetches with the default state before localStorage is read.
+    setIsMounted(true)
+  }, [])
+
+  useEffect(() => {
+    ;(async () => {
+      if (!isMounted) return
+
+      setAnalysisResults([])
+      setClosures([])
+      setError(null)
+      setLoadingClosures(true)
+      setOpenSuccessSnackbar(false)
+
+      try {
+        const fetchedClosures = await fetchClosures(island)
+
+        setClosures(fetchedClosures)
+      } catch (error: unknown) {
+        setError(error instanceof Error ? error.message : 'An unknown error occurred')
+
+        console.error('Error fetching closures:', error)
+      } finally {
+        setLoadingClosures(false)
+      }
+    })()
+  }, [island, isMounted])
+
+  if (!isMounted) return null
 
   return (
     <Container maxWidth={false} sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 }, pb: { xs: 1, sm: 1.5 } }}>
