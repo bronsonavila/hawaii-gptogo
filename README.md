@@ -1,4 +1,4 @@
-# GPToGo - AI Lane Closure Analysis Tool
+# GPToGo - AI Lane Closure Analysis
 
 A web application designed to fetch, display, and analyze lane closure information for the state of Hawaii.
 

@@ -3,8 +3,9 @@ import { MuiThemeProvider } from './theme-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  description: 'Displays current and upcoming lane closures in Hawaii.',
-  title: 'Hawaii Lane Closures'
+  description:
+    'A web application designed to fetch, display, and analyze lane closure information for the state of Hawaii.',
+  title: 'GPToGo - AI Lane Closure Analysis'
 }
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
