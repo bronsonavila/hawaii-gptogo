@@ -54,9 +54,9 @@ export const Footer = ({ disabled, loading, onAnalyze }: CustomFooterProps) => {
           borderTop: 1,
           display: 'flex',
           gap: 1,
-          justifyContent: 'flex-end',
+          mx: 'auto',
           p: 1,
-          width: '100%'
+          width: { xs: '100vw', sm: '80vw', md: '70vw', lg: '60vw' }
         }}
       >
         <TextField
