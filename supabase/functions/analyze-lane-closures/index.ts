@@ -94,7 +94,7 @@ For each impacted closure, include the closure's id and a detailed analysis of h
 
 // Main
 
-// @ts-ignore - Deno is globally available in Supabase Edge Functions
+// @ts-ignore
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin')
   const corsHeaders = getCorsHeaders(origin)
@@ -105,7 +105,9 @@ Deno.serve(async (req: Request) => {
   // Validate API Key
   if (!GEMINI_API_KEY) {
     console.error('GEMINI_API_KEY environment variable not set.')
+
     const errorResponse: ErrorResponse = { error: 'Server configuration error: Missing API key.' }
+
     return new Response(JSON.stringify(errorResponse), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500
@@ -115,6 +117,7 @@ Deno.serve(async (req: Request) => {
   // Validate Request Method and Content Type
   if (req.method !== 'POST') {
     const errorResponse: ErrorResponse = { error: 'Method Not Allowed' }
+
     return new Response(JSON.stringify(errorResponse), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 405
@@ -122,6 +125,7 @@ Deno.serve(async (req: Request) => {
   }
 
   let requestPayload: AnalyzeRequest
+
   try {
     requestPayload = await req.json()
   } catch (error) {
