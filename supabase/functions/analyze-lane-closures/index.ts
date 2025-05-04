@@ -84,6 +84,8 @@ ${JSON.stringify(closures, null, 2)}
 **Task:**
 Review the driving plan and the list of active lane closures. For each lane closure that might impact your driving plan, provide an analysis explaining how and why it could affect you. Address the analysis directly to the user (using "you" and "your").
 
+Assume the driving plan is for a one-way trip unless the user explicitly mentions a return trip.
+
 Only include closures that are likely to directly impact the user's plan based on the routes, locations, and timing mentioned. If a closure is not relevant to their plan, do not include it in the response.
 
 For each impacted closure, include the closure's id and a detailed analysis of how it might affect the user's drive.
