@@ -3,6 +3,7 @@ import TravelExploreIcon from '@mui/icons-material/TravelExplore'
 import { GridFooterContainer } from '@mui/x-data-grid'
 import { usePersistentState } from '@/hooks/usePersistentState'
 import React from 'react'
+import ClearIcon from '@mui/icons-material/Clear'
 
 // Types
 
@@ -64,9 +65,22 @@ export const Footer = ({ disabled, loading, onAnalyze }: CustomFooterProps) => {
           disabled={disabled || loading}
           fullWidth
           label="Enter your planned route"
-          onChange={e => setDrivingPlan(e.target.value)}
+          onChange={event => setDrivingPlan(event.target.value)}
           onKeyDown={handleKeyDown}
           size="small"
+          slotProps={{
+            input: {
+              endAdornment: (
+                <>
+                  {drivingPlan && !disabled && !loading && (
+                    <IconButton aria-label="clear input" edge="end" onClick={() => setDrivingPlan('')} size="small">
+                      <ClearIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                </>
+              )
+            }
+          }}
           sx={{ backgroundColor: theme => theme.palette.background.paper }}
           value={drivingPlan}
           variant="outlined"
