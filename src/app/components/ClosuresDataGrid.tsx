@@ -237,21 +237,14 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
             rowHeight={72}
             rows={rows}
             sx={{
-              '& .MuiDataGrid-footerContainer .MuiBox-root': {
-                borderTop: 'none'
-              },
-              '& .highlighted-row': {
-                backgroundColor: theme => alpha(theme.palette.info.light, 0.3)
-              },
+              '& .MuiDataGrid-footerContainer .MuiBox-root': { borderTop: 'none' },
+              '& .MuiDataGrid-footerContainer': { minHeight: 64 },
+              '& .highlighted-row': { backgroundColor: theme => alpha(theme.palette.info.light, 0.3) },
               '& .MuiDataGrid-row.highlighted-row:hover': {
                 backgroundColor: theme => alpha(theme.palette.info.light, 0.3)
               },
-              '& .MuiDataGrid-row:not(.highlighted-row):hover': {
-                backgroundColor: 'transparent'
-              },
-              '& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within': {
-                outline: 'none !important'
-              },
+              '& .MuiDataGrid-row:not(.highlighted-row):hover': { backgroundColor: 'transparent' },
+              '& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within': { outline: 'none !important' },
               '& .MuiDataGrid-cell': {
                 alignItems: 'flex-start',
                 boxSizing: 'border-box',
