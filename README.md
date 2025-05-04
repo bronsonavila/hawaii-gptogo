@@ -2,6 +2,8 @@
 
 A web application designed to fetch, display, and analyze lane closure information for the state of Hawaii.
 
+[Live site](https://bronsonavila.github.io/gptogo/)
+
 ## Overview
 
 GPToGo provides users with near real-time lane closure data sourced from the Hawaii Department of Transportation's [Lane Closure Public Access](https://hidot.hawaii.gov/highways/roadwork/) website.
