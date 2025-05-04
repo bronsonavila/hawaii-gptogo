@@ -5,7 +5,7 @@ import { ClosuresDataGrid, GridRowData } from './components/ClosuresDataGrid'
 import { AboutButton } from './components/AboutButton'
 import { analyzeDrivingPlan, ImpactedClosure } from '@/api/analyzeDrivingPlan'
 import { fetchClosures, ClosureFeature } from '@/api/fetchClosures'
-import { formatDate } from '@/utils/dateUtils'
+import { DateFormatSeparator, formatDate } from '@/utils/dateUtils'
 import { SelectChangeEvent } from '@mui/material/Select'
 import { SuccessSnackbar } from './components/SuccessSnackbar'
 import { useState, useEffect, useMemo, useCallback } from 'react'
@@ -52,8 +52,8 @@ export default function Home() {
         Route: `${properties.Route || 'N/A'} (Direction: ${properties.direct || 'N/A'})`,
         From: properties.intsfroml,
         To: properties.intstol,
-        Starts: formatDate(properties.beginDate),
-        Ends: formatDate(properties.enDate),
+        Starts: formatDate(properties.beginDate, DateFormatSeparator.CommaSpace),
+        Ends: formatDate(properties.enDate, DateFormatSeparator.CommaSpace),
         LanesAffected: properties.NumLanes
           ? `${properties.NumLanes} Lane${properties.NumLanes > 1 ? 's' : ''} (Side: ${
               properties.ClosureSide || 'N/A'

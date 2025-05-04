@@ -1,4 +1,12 @@
-export const formatDate = (timestamp: number | null): string => {
+export enum DateFormatSeparator {
+  Newline = '\n',
+  CommaSpace = ', '
+}
+
+export const formatDate = (
+  timestamp: number | null,
+  separator: DateFormatSeparator = DateFormatSeparator.Newline
+): string => {
   if (!timestamp) return 'N/A'
 
   const date = new Date(timestamp)
@@ -11,5 +19,5 @@ export const formatDate = (timestamp: number | null): string => {
     minute: '2-digit'
   })
 
-  return `${dayOfWeek}\n${dateTime}`
+  return `${dayOfWeek}${separator}${dateTime}`
 }
