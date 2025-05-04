@@ -12,7 +12,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 
 // Constants
 
-const ISLAND_OPTIONS = ['Oahu', 'Kauai', 'Maui', 'Hawaii', 'Lanai', 'Molokai']
+const ISLAND_OPTIONS = ['Hawaii', 'Kauai', 'Lanai', 'Maui', 'Molokai', 'Oahu']
 
 // Functions
 
