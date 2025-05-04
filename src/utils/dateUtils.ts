@@ -10,14 +10,11 @@ export const formatDate = (
   if (!timestamp) return 'N/A'
 
   const date = new Date(timestamp)
-  const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' })
-  const dateTime = date.toLocaleString('en-US', {
-    month: 'numeric',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit'
-  })
+  const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'short' })
+  const monthDay = date.toLocaleDateString('en-US', { day: 'numeric', month: 'numeric' })
+  const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
 
-  return `${dayOfWeek}${separator}${dateTime}`
+  const datePart = `${dayOfWeek} (${monthDay})`
+
+  return `${datePart}${separator}${time}`
 }

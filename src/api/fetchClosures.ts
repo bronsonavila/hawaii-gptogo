@@ -91,8 +91,11 @@ export const fetchClosures = async (island: string): Promise<ClosureFeature[]> =
     const sortedClosures = sortClosures((data as FeatureCollection).features || [])
     const mergedClosures = mergeIdenticalClosures(sortedClosures)
     const transformedClosures = mergedClosures.map(closure => {
+      closure.properties.DirPRemarks = replaceNewlinesWithPeriods(closure.properties.DirPRemarks)
       closure.properties.intsfroml = transformLocationString(closure.properties.intsfroml)
       closure.properties.intstol = transformLocationString(closure.properties.intstol)
+      closure.properties.Remarks = replaceNewlinesWithPeriods(closure.properties.Remarks)
+
       return closure
     })
 
@@ -220,6 +223,13 @@ const sortClosures = (features: ClosureFeature[]): ClosureFeature[] =>
 
     return locA.localeCompare(locB)
   })
+
+const replaceNewlinesWithPeriods = (text: string | null): string | null => {
+  if (!text) return null
+
+  // Replace newlines with period and space, then consolidate double periods
+  return text.replace(/\n/g, '. ').replace(/\.\. /g, '. ')
+}
 
 const transformLocationString = (location: string | null): string | null => {
   if (!location) return null

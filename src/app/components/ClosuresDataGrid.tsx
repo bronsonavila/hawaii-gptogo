@@ -89,8 +89,8 @@ const getColumns = (
     width: 130,
     valueGetter: (_: any, row: GridRowData) => `${row.Route || 'N/A'}\nDirection: ${row.direct || 'N/A'}`
   },
-  { field: 'intsfroml', headerName: 'From', flex: 1, minWidth: 150, disableColumnMenu: true },
-  { field: 'intstol', headerName: 'To', flex: 1, minWidth: 150, disableColumnMenu: true },
+  { field: 'intsfroml', headerName: 'From', disableColumnMenu: true, flex: 1, minWidth: 150 },
+  { field: 'intstol', headerName: 'To', disableColumnMenu: true, flex: 1, minWidth: 150 },
   {
     field: 'lanesAffected',
     headerName: 'Lanes Affected',
@@ -104,33 +104,31 @@ const getColumns = (
   {
     field: 'beginDate',
     headerName: 'Starts',
-    width: 110,
     disableColumnMenu: true,
+    width: 110,
     valueFormatter: (value: number | null) => formatDate(value)
   },
   {
     field: 'enDate',
     headerName: 'Ends',
-    width: 110,
     disableColumnMenu: true,
+    width: 110,
     valueFormatter: (value: number | null) => formatDate(value)
   },
   { field: 'ClosReason', headerName: 'Reason', disableColumnMenu: true },
   {
     field: 'DirPRemarks',
     headerName: 'Details',
-    flex: 1.5,
-    minWidth: 220,
     disableColumnMenu: true,
-    valueFormatter: (value: string | null) => value?.replace(/\n/g, '. ') || ''
+    flex: 1.5,
+    minWidth: 220
   },
   {
     field: 'Remarks',
     headerName: 'Remarks',
-    flex: 2,
-    minWidth: 220,
     disableColumnMenu: true,
-    valueFormatter: (value: string | null) => value?.replace(/\n/g, '. ') || ''
+    flex: 2,
+    minWidth: 220
   }
 ]
 
