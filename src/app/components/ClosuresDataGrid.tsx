@@ -190,10 +190,11 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
         const virtualScroller = gridRef.current.querySelector(virtualScrollerSelector) as HTMLElement
 
         scrollToElement({
-          containerSelector: virtualScrollerSelector,
-          targetSelector: rowSelector,
+          behavior: 'smooth',
           containerElement: virtualScroller,
-          behavior: 'smooth'
+          containerSelector: virtualScrollerSelector,
+          left: 0,
+          targetSelector: rowSelector
         })
       }, 0)
     }
