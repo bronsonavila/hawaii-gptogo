@@ -200,20 +200,21 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
       setTimeout(() => {
         if (!gridRef.current) return
 
-        const firstImpactedId = Array.from(impactedClosureIds)[0]
-
         const virtualScrollerSelector = '.MuiDataGrid-virtualScroller'
-        const rowSelector = `[data-id="${firstImpactedId}"]`
+        const highlightedRowSelector = '.highlighted-row'
 
         const virtualScroller = gridRef.current.querySelector(virtualScrollerSelector) as HTMLElement
+        const firstHighlightedRow = gridRef.current.querySelector(highlightedRowSelector) as HTMLElement
 
-        scrollToElement({
-          behavior: 'smooth',
-          containerElement: virtualScroller,
-          containerSelector: virtualScrollerSelector,
-          left: 0,
-          targetSelector: rowSelector
-        })
+        if (firstHighlightedRow) {
+          scrollToElement({
+            behavior: 'smooth',
+            containerElement: virtualScroller,
+            containerSelector: virtualScrollerSelector,
+            left: 0,
+            targetSelector: `[data-id="${firstHighlightedRow.getAttribute('data-id')}"]`
+          })
+        }
       }, 0)
     }
   }, [loadingAnalysis, impactedClosureIds, rows, scrollToElement])
