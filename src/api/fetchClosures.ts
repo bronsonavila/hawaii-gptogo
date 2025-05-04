@@ -90,8 +90,13 @@ export const fetchClosures = async (island: string): Promise<ClosureFeature[]> =
 
     const sortedClosures = sortClosures((data as FeatureCollection).features || [])
     const mergedClosures = mergeIdenticalClosures(sortedClosures)
+    const transformedClosures = mergedClosures.map(closure => {
+      closure.properties.intsfroml = transformLocationString(closure.properties.intsfroml)
+      closure.properties.intstol = transformLocationString(closure.properties.intstol)
+      return closure
+    })
 
-    return mergedClosures
+    return transformedClosures
   } catch (error: unknown) {
     console.error('Fetch error in fetchClosures:', error)
 
@@ -215,3 +220,12 @@ const sortClosures = (features: ClosureFeature[]): ClosureFeature[] =>
 
     return locA.localeCompare(locB)
   })
+
+const transformLocationString = (location: string | null): string | null => {
+  if (!location) return null
+
+  const cutoff = ', Hawaii, '
+  const index = location.indexOf(cutoff)
+
+  return index !== -1 ? location.substring(0, index) : location
+}
