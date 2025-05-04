@@ -35,22 +35,21 @@ export const AboutButton = () => {
         <DialogContent>
           <Stack spacing={1.5}>
             <Typography variant="body2">
-              Information regarding lane closures for the upcoming 24 hours is sourced from the Hawaii Department of
-              Transportation's{' '}
+              This website uses data from the Hawaii Department of Transportation's{' '}
               <Link href="https://hidot.hawaii.gov/highways/roadwork/" rel="noopener noreferrer" target="_blank">
                 Lane Closure Public Access
               </Link>{' '}
-              website.
+              ArcGIS API to show lane closures occurring in the next 24 hours.
             </Typography>
 
             <Typography variant="body2">
-              To see how these closures might impact your trip, enter your planned route in the text field below the
-              table for an AI-generated analysis.
+              Enter your planned route and travel timeframe to get an AI-generated analysis of how these closures might
+              impact your trip.
             </Typography>
 
             <Typography variant="body2">
               For the most accurate analysis, please include specific details such as route numbers, direction, key
-              locations or intersections, and your estimated time of travel.
+              locations or intersections, and planned travel timeframe.
             </Typography>
           </Stack>
 
