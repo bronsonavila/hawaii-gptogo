@@ -48,8 +48,8 @@ export const AboutButton = () => {
             </Typography>
 
             <Typography variant="body2">
-              For the most accurate analysis, please include specific details such as route numbers, direction, key
-              locations or intersections, and planned travel timeframe.
+              For the most accurate analysis, please include specific details such as route numbers, direction, and key
+              locations (e.g., exit numbers, intersections, etc.).
             </Typography>
           </Stack>
 
