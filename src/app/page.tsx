@@ -181,7 +181,7 @@ export default function Home() {
           </Typography>
 
           <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', lineHeight: 1, mt: -0.5 }}>
-            AI Lane Closure Analysis Tool
+            AI Lane Closure Analysis
           </Typography>
         </Box>
       </Typography>
