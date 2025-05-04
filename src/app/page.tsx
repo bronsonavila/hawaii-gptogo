@@ -49,8 +49,7 @@ export default function Home() {
     () =>
       closures.map(({ properties }) => ({
         id: properties.OBJECTID,
-        Route: properties.Route,
-        Direction: properties.direct,
+        Route: `${properties.Route || 'N/A'} (Direction: ${properties.direct || 'N/A'})`,
         From: properties.intsfroml,
         To: properties.intstol,
         Starts: formatDate(properties.beginDate),

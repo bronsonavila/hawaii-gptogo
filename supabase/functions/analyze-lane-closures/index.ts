@@ -19,7 +19,6 @@ interface AnalyzeRequest {
 export interface ClosureInfo {
   id: number | null
   Route: string | null
-  Direction: string | null
   From: string | null
   To: string | null
   Starts: string | null

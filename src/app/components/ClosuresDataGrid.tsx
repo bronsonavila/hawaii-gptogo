@@ -81,8 +81,13 @@ const getColumns = (
       )
     }
   },
-  { field: 'Route', headerName: 'Route', disableColumnMenu: true },
-  { field: 'direct', headerName: 'Direction', disableColumnMenu: true },
+  {
+    field: 'Route',
+    headerName: 'Route',
+    disableColumnMenu: true,
+    width: 130,
+    valueGetter: (_: any, row: GridRowData) => `${row.Route || 'N/A'}\nDirection: ${row.direct || 'N/A'}`
+  },
   { field: 'intsfroml', headerName: 'From', flex: 1, minWidth: 150, disableColumnMenu: true },
   { field: 'intstol', headerName: 'To', flex: 1, minWidth: 150, disableColumnMenu: true },
   {
@@ -92,8 +97,8 @@ const getColumns = (
     disableColumnMenu: true,
     valueGetter: (_: any, row: GridRowData) =>
       row.NumLanes
-        ? `${row.NumLanes} Lane${row.NumLanes > 1 ? 's' : ''}\n(Side: ${row.ClosureSide || 'N/A'})`
-        : `${row.CloseFact || 'N/A'}\n(Side: ${row.ClosureSide || 'N/A'})`
+        ? `${row.NumLanes} Lane${row.NumLanes > 1 ? 's' : ''}\nSide: ${row.ClosureSide || 'N/A'}`
+        : `${row.CloseFact || 'N/A'}\nSide: ${row.ClosureSide || 'N/A'}`
   },
   {
     field: 'beginDate',
