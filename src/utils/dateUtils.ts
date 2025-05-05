@@ -18,3 +18,14 @@ export const formatDate = (
 
   return `${datePart}${separator}${time}`
 }
+
+export const getFormattedDatePrefix = (): string => {
+  const formattedDate = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric'
+  })
+
+  return `Today's date is ${formattedDate}. `
+}

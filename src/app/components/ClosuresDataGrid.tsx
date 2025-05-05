@@ -13,9 +13,8 @@ import { ClosureFeature, ClosureProperties } from '@/api/fetchClosures'
 import { DataGrid, GridColDef, GridRowClassNameParams, GridRenderCellParams } from '@mui/x-data-grid'
 import { Footer } from './Footer'
 import { formatDate } from '@/utils/dateUtils'
-import { useScrollToElement } from '@/hooks/useScrollToElement'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import React, { useState, MouseEvent, useEffect, useRef } from 'react'
+import React, { useState, MouseEvent } from 'react'
 
 // Types
 
@@ -166,7 +165,6 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
 }) => {
   const [popoverAnchorEl, setPopoverAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [popoverContent, setPopoverContent] = useState<string>('')
-  const gridRef = useRef<HTMLDivElement>(null)
 
   const isTouchDevice = typeof window !== 'undefined' && window.navigator.maxTouchPoints > 0
 
@@ -190,34 +188,7 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
     setPopoverContent('')
   }
 
-  const scrollToElement = useScrollToElement()
-
   const columns = getColumns(impactedClosureIds, analysisResultsMap, isTouchDevice, handleIconClick)
-
-  useEffect(() => {
-    // Scroll to the first highlighted row after analysis is complete
-    if (!loadingAnalysis && impactedClosureIds.size > 0 && rows.length > 0) {
-      setTimeout(() => {
-        if (!gridRef.current) return
-
-        const virtualScrollerSelector = '.MuiDataGrid-virtualScroller'
-        const highlightedRowSelector = '.highlighted-row'
-
-        const virtualScroller = gridRef.current.querySelector(virtualScrollerSelector) as HTMLElement
-        const firstHighlightedRow = gridRef.current.querySelector(highlightedRowSelector) as HTMLElement
-
-        if (firstHighlightedRow) {
-          scrollToElement({
-            behavior: 'smooth',
-            containerElement: virtualScroller,
-            containerSelector: virtualScrollerSelector,
-            left: 0,
-            targetSelector: `[data-id="${firstHighlightedRow.getAttribute('data-id')}"]`
-          })
-        }
-      }, 0)
-    }
-  }, [loadingAnalysis, impactedClosureIds, rows, scrollToElement])
 
   if (loading) {
     return (
@@ -238,7 +209,7 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
   return (
     <Box>
       {rows.length === 0 ? null : (
-        <Box ref={gridRef} sx={{ height: gridHeight, width: '100%' }}>
+        <Box sx={{ height: gridHeight, width: '100%' }}>
           <DataGrid<GridRowData>
             columns={columns}
             disableColumnFilter

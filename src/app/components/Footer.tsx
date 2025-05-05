@@ -1,9 +1,9 @@
 import { Box, CircularProgress, TextField, IconButton, Tooltip } from '@mui/material'
-import TravelExploreIcon from '@mui/icons-material/TravelExplore'
 import { GridFooterContainer } from '@mui/x-data-grid'
 import { usePersistentState } from '@/hooks/usePersistentState'
-import React from 'react'
 import ClearIcon from '@mui/icons-material/Clear'
+import React from 'react'
+import TravelExploreIcon from '@mui/icons-material/TravelExplore'
 
 // Types
 

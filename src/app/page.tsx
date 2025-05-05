@@ -1,35 +1,16 @@
 'use client'
 
 import { AboutButton } from './components/AboutButton'
-import { Alert, Box, Container, MenuItem, Select, Typography } from '@mui/material'
+import { Alert, Container } from '@mui/material'
 import { analyzeDrivingPlan, ImpactedClosure } from '@/api/analyzeDrivingPlan'
 import { ClosuresDataGrid, GridRowData } from './components/ClosuresDataGrid'
-import { DateFormatSeparator, formatDate } from '@/utils/dateUtils'
+import { ClosureStatusText } from './components/ClosureStatusText'
+import { DateFormatSeparator, formatDate, getFormattedDatePrefix } from '@/utils/dateUtils'
 import { fetchClosures, ClosureFeature } from '@/api/fetchClosures'
-import { SelectChangeEvent } from '@mui/material/Select'
-import { Skeleton } from '@mui/material'
+import { Header } from './components/Header'
 import { SuccessSnackbar } from './components/SuccessSnackbar'
 import { usePersistentState } from '@/hooks/usePersistentState'
 import { useState, useEffect, useMemo, useCallback } from 'react'
-
-// Constants
-
-const ISLAND_OPTIONS = ['Hawaii', 'Kauai', 'Lanai', 'Maui', 'Molokai', 'Oahu']
-
-// Functions
-
-const getFormattedDatePrefix = (): string => {
-  const formattedDate = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric'
-  })
-
-  return `Today's date is ${formattedDate}. `
-}
-
-// Component
 
 export default function Home() {
   const [analysisResults, setAnalysisResults] = useState<ImpactedClosure[]>([])
@@ -40,6 +21,7 @@ export default function Home() {
   const [loadingAnalysis, setLoadingAnalysis] = useState<boolean>(false)
   const [loadingClosures, setLoadingClosures] = useState<boolean>(true)
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState<boolean>(false)
+  const [showAllClosures, setShowAllClosures] = useState<boolean>(false)
 
   const analysisResultsMap = useMemo(() => {
     const map = new Map<number, string>()
@@ -72,13 +54,17 @@ export default function Home() {
 
   const impactedClosureIds = useMemo(() => new Set(analysisResults.map(result => result.id)), [analysisResults])
 
-  const rows: GridRowData[] = useMemo(
-    () =>
-      closures
-        .filter(closure => typeof closure.properties.OBJECTID === 'number')
-        .map(closure => ({ id: closure.properties.OBJECTID as number, ...closure.properties })),
-    [closures]
-  )
+  const rows: GridRowData[] = useMemo(() => {
+    const baseRows = closures.filter(closure => typeof closure.properties.OBJECTID === 'number')
+
+    if (impactedClosureIds.size > 0 && !showAllClosures) {
+      return baseRows
+        .filter(closure => impactedClosureIds.has(closure.properties.OBJECTID as number))
+        .map(closure => ({ id: closure.properties.OBJECTID as number, ...closure.properties }))
+    }
+
+    return baseRows.map(closure => ({ id: closure.properties.OBJECTID as number, ...closure.properties }))
+  }, [closures, impactedClosureIds, showAllClosures])
 
   const handleCloseSuccessSnackbar = (_?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return
@@ -91,6 +77,7 @@ export default function Home() {
       if (!drivingPlan.trim()) {
         setError('Please enter your driving plan.')
         setOpenSuccessSnackbar(false)
+        setShowAllClosures(false)
 
         return
       }
@@ -99,6 +86,7 @@ export default function Home() {
       setError(null)
       setLoadingAnalysis(true)
       setOpenSuccessSnackbar(false)
+      setShowAllClosures(false)
 
       const planWithDate = `${getFormattedDatePrefix()}${drivingPlan}`
 
@@ -136,6 +124,7 @@ export default function Home() {
       setError(null)
       setLoadingClosures(true)
       setOpenSuccessSnackbar(false)
+      setShowAllClosures(false)
 
       try {
         const fetchedClosures = await fetchClosures(island)
@@ -155,61 +144,21 @@ export default function Home() {
 
   return (
     <Container maxWidth={false} sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 }, pb: { xs: 1, sm: 1.5 } }}>
-      <Typography
-        component="h1"
-        gutterBottom
-        sx={{
-          alignItems: 'center',
-          display: 'flex',
-          fontSize: { xs: '1.2rem', sm: '1.5rem' },
-          letterSpacing: '0.00735em',
-          lineHeight: 1.235
-        }}
-        variant="h5"
-      >
-        <Select
-          disableUnderline
-          disabled={loadingClosures || loadingAnalysis}
-          MenuProps={{ PaperProps: { style: { maxHeight: 48 * 4.5 + 8, width: 250 } } }}
-          onChange={(event: SelectChangeEvent<string>) => setIsland(event.target.value as string)}
-          sx={{
-            fontSize: 'inherit',
-            fontWeight: 'inherit',
-            mr: 1,
-            '.MuiSelect-select': { pb: '2px' },
-            '.MuiSvgIcon-root': { fontSize: '1.5rem' }
-          }}
-          value={island}
-          variant="standard"
-        >
-          {ISLAND_OPTIONS.map(island => (
-            <MenuItem key={island} value={island}>
-              {island}
-            </MenuItem>
-          ))}
-        </Select>
+      <Header
+        island={island}
+        loadingAnalysis={loadingAnalysis}
+        loadingClosures={loadingClosures}
+        onIslandChange={setIsland}
+      />
 
-        <Box sx={{ alignItems: 'baseline', display: 'flex', flexDirection: 'row', gap: 2.5, width: '100%' }}>
-          <Typography component="span" variant="inherit" sx={{ pt: '3px' }}>
-            GPToGo
-          </Typography>
-
-          <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', lineHeight: 1, mt: -0.5 }}>
-            AI Lane Closure Analysis
-          </Typography>
-        </Box>
-      </Typography>
-
-      <Typography color="text.secondary" variant="subtitle1" gutterBottom>
-        {loadingClosures ? (
-          <Skeleton animation="wave" variant="text" width="300px" />
-        ) : (
-          <>
-            {rows.length === 0 ? 'No closures' : `${rows.length} ${rows.length === 1 ? 'closure' : 'closures'}`}
-            {' active within the next 24 hours.'}
-          </>
-        )}
-      </Typography>
+      <ClosureStatusText
+        closures={closures}
+        impactedClosureIds={impactedClosureIds}
+        loadingClosures={loadingClosures}
+        onShowAllClick={() => setShowAllClosures(true)}
+        rows={rows}
+        showAllClosures={showAllClosures}
+      />
 
       {error && (
         <Alert severity="error" sx={{ my: 2 }}>
