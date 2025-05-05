@@ -5,7 +5,6 @@ import { Alert, Container } from '@mui/material'
 import { analyzeDrivingPlan, ImpactedClosure } from '@/api/analyzeDrivingPlan'
 import { ClosuresDataGrid, GridRowData } from './components/ClosuresDataGrid'
 import { ClosureStatusText } from './components/ClosureStatusText'
-import { DateFormatSeparator, formatDate, getFormattedDatePrefix } from '@/utils/dateUtils'
 import { fetchClosures, ClosureFeature } from '@/api/fetchClosures'
 import { Header } from './components/Header'
 import { SuccessSnackbar } from './components/SuccessSnackbar'
@@ -31,27 +30,6 @@ export default function Home() {
     return map
   }, [analysisResults])
 
-  const closureInfoForApi = useMemo(
-    () =>
-      closures.map(({ properties }) => ({
-        id: properties.OBJECTID,
-        Route: `${properties.Route || 'N/A'} (Direction: ${properties.direct || 'N/A'})`,
-        From: properties.intsfroml,
-        To: properties.intstol,
-        Starts: formatDate(properties.beginDate, DateFormatSeparator.CommaSpace),
-        Ends: formatDate(properties.enDate, DateFormatSeparator.CommaSpace),
-        LanesAffected: properties.NumLanes
-          ? `${properties.NumLanes} Lane${properties.NumLanes > 1 ? 's' : ''} (Side: ${
-              properties.ClosureSide || 'N/A'
-            })`
-          : `${properties.CloseFact || 'N/A'} (Side: ${properties.ClosureSide || 'N/A'})`,
-        Reason: properties.ClosReason,
-        Details: properties.DirPRemarks,
-        Remarks: properties.Remarks
-      })),
-    [closures]
-  )
-
   const impactedClosureIds = useMemo(() => new Set(analysisResults.map(result => result.id)), [analysisResults])
 
   const rows: GridRowData[] = useMemo(() => {
@@ -66,11 +44,7 @@ export default function Home() {
     return baseRows.map(closure => ({ id: closure.properties.OBJECTID as number, ...closure.properties }))
   }, [closures, impactedClosureIds, isShowingAllClosures])
 
-  const handleCloseSuccessSnackbar = (_?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') return
-
-    setIsSuccessSnackbarOpen(false)
-  }
+  // Functions
 
   const handleAnalyzePlan = useCallback(
     async (drivingPlan: string) => {
@@ -88,10 +62,8 @@ export default function Home() {
       setIsSuccessSnackbarOpen(false)
       setIsShowingAllClosures(false)
 
-      const planWithDate = `${getFormattedDatePrefix()}${drivingPlan}`
-
       try {
-        const results = await analyzeDrivingPlan(closureInfoForApi, planWithDate)
+        const results = await analyzeDrivingPlan(closures, drivingPlan)
 
         setAnalysisResults(results)
 
@@ -106,8 +78,16 @@ export default function Home() {
         setIsLoadingAnalysis(false)
       }
     },
-    [closureInfoForApi]
+    [closures]
   )
+
+  const handleCloseSuccessSnackbar = (_?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') return
+
+    setIsSuccessSnackbarOpen(false)
+  }
+
+  // Effects
 
   useEffect(() => {
     // This ensures the component only renders client-side after hydration,
@@ -139,6 +119,8 @@ export default function Home() {
       }
     })()
   }, [island, isMounted])
+
+  // Render
 
   if (!isMounted) return null
 
