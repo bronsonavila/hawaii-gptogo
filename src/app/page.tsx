@@ -133,6 +133,7 @@ export default function Home() {
       setIsLoadingClosures(true)
       setIsSuccessSnackbarOpen(false)
       setIsShowingAllClosures(false)
+      setSortModel([{ field: 'Route', sort: 'asc' }])
 
       try {
         const fetchedClosures = await fetchClosures(island)
