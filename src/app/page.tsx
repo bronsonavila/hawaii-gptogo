@@ -87,6 +87,8 @@ export default function Home() {
     setIsSuccessSnackbarOpen(false)
   }
 
+  const handleToggleView = useCallback((showAll: boolean) => setIsShowingAllClosures(showAll), [])
+
   // Effects
 
   useEffect(() => {
@@ -138,8 +140,7 @@ export default function Home() {
         impactedClosureIds={impactedClosureIds}
         isLoadingClosures={isLoadingClosures}
         isShowingAllClosures={isShowingAllClosures}
-        onShowAllClick={() => setIsShowingAllClosures(true)}
-        rows={rows}
+        onToggleView={handleToggleView}
       />
 
       {error && (
