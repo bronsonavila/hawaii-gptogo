@@ -8,6 +8,10 @@ interface AnalysisResponse {
   impactedClosures: {
     id: number
     analysis: string
+    impactScore: {
+      level: string
+      value: number
+    }
   }[]
 }
 
@@ -46,9 +50,24 @@ const AI_SCHEMA = {
       analysis: {
         type: 'string',
         description: "Detailed analysis of how this specific lane closure affects the user's driving plan"
+      },
+      impactScore: {
+        type: 'object',
+        properties: {
+          level: {
+            type: 'string',
+            description: "A descriptive label for the impact level ('Low', 'Medium', 'High', 'Severe')"
+          },
+          value: {
+            type: 'number',
+            description: 'Numeric value representing the impact score (1 = Low, 2 = Medium, 3 = High, 4 = Severe)'
+          }
+        },
+        required: ['level', 'value'],
+        description: "Score evaluating the magnitude and directness of the impact on the user's route"
       }
     },
-    required: ['id', 'analysis']
+    required: ['id', 'analysis', 'impactScore']
   }
 }
 
@@ -88,7 +107,30 @@ Assume the driving plan is for a one-way trip unless the user explicitly mention
 
 Only include closures that are likely to directly impact the user's plan based on the routes, locations, and timing mentioned. If a closure is not relevant to their plan, do not include it in the response.
 
-For each impacted closure, include the closure's id and a detailed analysis of how it might affect the user's drive.
+For each impacted closure, include:
+1. The closure's id
+2. A detailed analysis of how it might affect the user's drive
+3. An impact score with the following criteria:
+   - Level: One of ['Low', 'Medium', 'High', 'Severe']
+   - Value: Corresponding numeric value (1 = Low, 2 = Medium, 3 = High, 4 = Severe)
+
+The impact score should consider the following factors, using information from all provided closure fields:
+
+1.  **Directness & Location:**
+    *   How directly the closure affects the user's specific route (e.g., on the route vs. nearby surface street)?
+    *   Type of Closure: Is it a full closure, ramp closure, lane closure, or shoulder closure? (Check \`LanesAffected\`, \`Details\`, \`Remarks\`. Ramp/Full closures usually have higher impact if on the route; shoulder closures usually lower).
+
+2.  **Timing & Duration:**
+    *   Time Sensitivity: Does the closure overlap with the user's likely travel time based on their plan and current time?
+
+3.  **Severity & Disruption:**
+    *   Number of Lanes Affected: How many lanes are closed relative to the total available? (More lanes = higher impact). Check \`Remarks\` for phrases like "one lane closed at a time" which might reduce impact compared to simultaneous closures.
+    *   Nature of Work: Is it routine maintenance (e.g., grass trimming, litter pickup) or potentially more disruptive work (e.g., emergency repairs, paving, construction)? Check \`Reason\` and \`Details\`.
+    *   Magnitude of Impact: Overall, is this likely to cause minor delays or major disruption?
+
+4.  **Predictability & Mitigation:**
+    *   Is the closure roving/mobile? (Check \`Details\`/\`Remarks\` for 'Roving'). These increase uncertainty and potential impact area.
+    *   Alternative Route Availability: Are easy detours explicitly mentioned or obviously available?
 `
 }
 

@@ -2,7 +2,7 @@
 
 import { AboutButton } from './components/AboutButton'
 import { Alert, Container } from '@mui/material'
-import { analyzeDrivingPlan, ImpactedClosure } from '@/api/analyzeDrivingPlan'
+import { analyzeDrivingPlan, ImpactedClosure, ImpactScore } from '@/api/analyzeDrivingPlan'
 import { ClosuresDataGrid, GridRowData } from './components/ClosuresDataGrid'
 import { ClosureStatusText } from './components/ClosureStatusText'
 import { fetchClosures, ClosureFeature } from '@/api/fetchClosures'
@@ -23,9 +23,11 @@ export default function Home() {
   const [isSuccessSnackbarOpen, setIsSuccessSnackbarOpen] = useState<boolean>(false)
 
   const analysisResultsMap = useMemo(() => {
-    const map = new Map<number, string>()
+    const map = new Map<number, { analysis: string; impactScore: ImpactScore }>()
 
-    analysisResults.forEach(result => map.set(result.id, result.analysis))
+    analysisResults.forEach(result =>
+      map.set(result.id, { analysis: result.analysis, impactScore: result.impactScore })
+    )
 
     return map
   }, [analysisResults])

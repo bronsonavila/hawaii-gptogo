@@ -4,6 +4,7 @@ import {
   CircularProgress,
   IconButton,
   Popover,
+  Theme,
   Tooltip,
   Typography,
   useMediaQuery,
@@ -19,6 +20,8 @@ import {
 } from '@mui/x-data-grid'
 import { Footer } from './Footer'
 import { formatDate } from '@/utils/dateUtils'
+import { ImpactLevel } from '@/utils/impactUtils'
+import { ImpactScore } from '@/api/analyzeDrivingPlan'
 import DarkMode from '@mui/icons-material/DarkMode'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import LightMode from '@mui/icons-material/LightMode'
@@ -27,7 +30,7 @@ import React, { useState, MouseEvent } from 'react'
 // Types
 
 interface ClosuresDataGridProps {
-  analysisResultsMap: Map<number, string>
+  analysisResultsMap: Map<number, { analysis: string; impactScore: ImpactScore }>
   closures: ClosureFeature[]
   impactedClosureIds: Set<number>
   isLoadingAnalysis: boolean
@@ -49,9 +52,10 @@ const MAX_WIDTHS = {
 
 const getColumns = (
   impactedClosureIds: Set<number>,
-  analysisResultsMap: Map<number, string>,
+  analysisResultsMap: Map<number, { analysis: string; impactScore: ImpactScore }>,
   isTouchDevice: boolean,
-  handleIconClick: (event: MouseEvent<HTMLButtonElement>, content: string) => void
+  handleIconClick: (event: MouseEvent<HTMLButtonElement>, content: string, impactScore: ImpactScore) => void,
+  theme: Theme
 ): GridColDef<GridRowData>[] => [
   {
     field: 'analysisInfo',
@@ -64,34 +68,56 @@ const getColumns = (
 
       if (!impactedClosureIds.has(closureId)) return null
 
-      const analysisText = analysisResultsMap.get(closureId) || 'Analysis not available.'
+      const analysisData = analysisResultsMap.get(closureId)
+
+      if (!analysisData) return null
+
+      const { analysis, impactScore } = analysisData
+      const { color, shade } = getImpactColor(impactScore.level)
+
+      const resolvedColor = theme.palette[color][shade]
+
+      const iconProps = { fontSize: 'small' as const, sx: { color: resolvedColor } }
 
       if (isTouchDevice) {
         return (
           <IconButton
             aria-label="Show analysis"
-            onClick={event => handleIconClick(event, analysisText)}
+            onClick={event => handleIconClick(event, analysis, impactScore)}
             size="small"
-            sx={{ py: 0 }}
+            sx={{ p: 0.5 }}
           >
-            <InfoOutlinedIcon color="info" />
+            <InfoOutlinedIcon fontSize={iconProps.fontSize} sx={iconProps.sx} />
           </IconButton>
         )
       }
 
       return (
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <Tooltip
-            arrow
-            title={
-              <Typography sx={{ whiteSpace: 'pre-line' }} variant="body2">
-                {analysisText}
+        <Tooltip
+          arrow
+          title={
+            <Box>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Impact: <strong style={{ color: resolvedColor }}>{impactScore.level}</strong>
               </Typography>
-            }
-          >
-            <InfoOutlinedIcon color="info" fontSize="small" sx={{ cursor: 'pointer' }} />
-          </Tooltip>
-        </Box>
+
+              <Typography sx={{ whiteSpace: 'pre-line' }} variant="body2">
+                {analysis}
+              </Typography>
+            </Box>
+          }
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <IconButton
+              aria-label="Show analysis tooltip"
+              size="small"
+              sx={{ p: 0.5, cursor: 'pointer' }}
+              tabIndex={-1}
+            >
+              <InfoOutlinedIcon fontSize={iconProps.fontSize} sx={iconProps.sx} />
+            </IconButton>
+          </Box>
+        </Tooltip>
       )
     }
   },
@@ -169,6 +195,21 @@ const getColumns = (
   }
 ]
 
+const getImpactColor = (level: string): { color: 'info' | 'success' | 'warning' | 'error'; shade: 'main' | 'dark' } => {
+  switch (level) {
+    case ImpactLevel.Low:
+      return { color: 'info', shade: 'main' }
+    case ImpactLevel.Medium:
+      return { color: 'success', shade: 'main' }
+    case ImpactLevel.High:
+      return { color: 'warning', shade: 'main' }
+    case ImpactLevel.Severe:
+      return { color: 'error', shade: 'main' }
+    default:
+      return { color: 'info', shade: 'main' }
+  }
+}
+
 const getTimeOfDayIcon = (timestamp: number | null): React.ReactNode => {
   if (timestamp === null) return null
 
@@ -202,6 +243,7 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
 }) => {
   const [popoverAnchorEl, setPopoverAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [popoverContent, setPopoverContent] = useState<string>('')
+  const [popoverImpactScore, setPopoverImpactScore] = useState<ImpactScore | null>(null)
 
   const isTouchDevice = typeof window !== 'undefined' && window.navigator.maxTouchPoints > 0
 
@@ -223,17 +265,19 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
     return true
   }
 
-  const handleIconClick = (event: MouseEvent<HTMLButtonElement>, content: string) => {
+  const handleIconClick = (event: MouseEvent<HTMLButtonElement>, content: string, impactScore: ImpactScore) => {
     setPopoverAnchorEl(event.currentTarget)
     setPopoverContent(content)
+    setPopoverImpactScore(impactScore)
   }
 
   const handlePopoverClose = () => {
     setPopoverAnchorEl(null)
     setPopoverContent('')
+    setPopoverImpactScore(null)
   }
 
-  const columns = getColumns(impactedClosureIds, analysisResultsMap, isTouchDevice, handleIconClick)
+  const columns = getColumns(impactedClosureIds, analysisResultsMap, isTouchDevice, handleIconClick, theme)
 
   if (isLoadingClosures) {
     return (
@@ -310,14 +354,35 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
       )}
 
       <Popover
-        id={popoverId}
-        open={openPopover}
         anchorEl={popoverAnchorEl}
+        anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
+        id={popoverId}
         onClose={handlePopoverClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        open={openPopover}
+        transformOrigin={{ horizontal: 'center', vertical: 'top' }}
       >
-        <Typography sx={{ p: 2, whiteSpace: 'pre-line' }}>{popoverContent}</Typography>
+        <Box sx={{ p: 2, maxWidth: 400 }}>
+          {popoverImpactScore && (
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              Impact:{' '}
+              <strong
+                style={{
+                  color: popoverImpactScore
+                    ? theme.palette[getImpactColor(popoverImpactScore.level).color][
+                        getImpactColor(popoverImpactScore.level).shade
+                      ]
+                    : undefined
+                }}
+              >
+                {popoverImpactScore.level}
+              </strong>
+            </Typography>
+          )}
+
+          <Typography sx={{ whiteSpace: 'pre-line' }} variant="body2">
+            {popoverContent}
+          </Typography>
+        </Box>
       </Popover>
     </Box>
   )

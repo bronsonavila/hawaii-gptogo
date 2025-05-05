@@ -18,6 +18,12 @@ interface FunctionErrorResponse {
 export interface ImpactedClosure {
   id: number
   analysis: string
+  impactScore: ImpactScore
+}
+
+export interface ImpactScore {
+  level: string
+  value: number
 }
 
 // Functions
