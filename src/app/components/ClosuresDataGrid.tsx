@@ -173,7 +173,8 @@ const getTimeOfDayIcon = (timestamp: number | null): React.ReactNode => {
   if (timestamp === null) return null
 
   const date = new Date(timestamp)
-  const hour = date.getHours()
+  const timeString = date.toLocaleString('en-US', { timeZone: 'Pacific/Honolulu', hour: 'numeric', hour12: false })
+  const hour = parseInt(timeString, 10)
 
   const isEarlyMorning = hour >= 0 && hour < 6
   const isDaytime = hour >= 6 && hour < 18
