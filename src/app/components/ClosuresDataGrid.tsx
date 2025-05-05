@@ -10,7 +10,13 @@ import {
   useTheme
 } from '@mui/material'
 import { ClosureFeature, ClosureProperties } from '@/api/fetchClosures'
-import { DataGrid, GridColDef, GridRowClassNameParams, GridRenderCellParams } from '@mui/x-data-grid'
+import {
+  DataGrid,
+  GridColDef,
+  GridColumnResizeParams,
+  GridRenderCellParams,
+  GridRowClassNameParams
+} from '@mui/x-data-grid'
 import { Footer } from './Footer'
 import { formatDate } from '@/utils/dateUtils'
 import DarkMode from '@mui/icons-material/DarkMode'
@@ -33,6 +39,13 @@ interface ClosuresDataGridProps {
 
 export type GridRowData = ClosureProperties & { id: number }
 
+// Constants
+
+const MAX_WIDTHS = {
+  DirPRemarks: 320,
+  Remarks: 1200
+}
+
 // Functions
 
 const getColumns = (
@@ -44,8 +57,7 @@ const getColumns = (
   {
     field: 'analysisInfo',
     headerName: '',
-    disableColumnMenu: true,
-    filterable: false,
+    resizable: false,
     sortable: false,
     width: 40,
     renderCell: (params: GridRenderCellParams<GridRowData>) => {
@@ -87,18 +99,16 @@ const getColumns = (
   {
     field: 'Route',
     headerName: 'Route',
-    disableColumnMenu: true,
     width: 130,
-    valueGetter: (_: any, row: GridRowData) => `${row.Route || 'N/A'}\nDirection: ${row.direct || 'N/A'}`
+    valueGetter: (_, row: GridRowData) => `${row.Route || 'N/A'}\nDirection: ${row.direct || 'N/A'}`
   },
-  { field: 'intsfroml', headerName: 'From', disableColumnMenu: true, flex: 1, minWidth: 160 },
-  { field: 'intstol', headerName: 'To', disableColumnMenu: true, flex: 1, minWidth: 160 },
+  { field: 'intsfroml', headerName: 'From', flex: 1, minWidth: 160 },
+  { field: 'intstol', headerName: 'To', flex: 1, minWidth: 160 },
   {
     field: 'lanesAffected',
     headerName: 'Lanes Affected',
     width: 150,
-    disableColumnMenu: true,
-    valueGetter: (_: any, row: GridRowData) =>
+    valueGetter: (_, row: GridRowData) =>
       row.NumLanes
         ? `${row.NumLanes} Lane${row.NumLanes > 1 ? 's' : ''}\nSide: ${row.ClosureSide || 'N/A'}`
         : `${row.CloseFact || 'N/A'}\nSide: ${row.ClosureSide || 'N/A'}`
@@ -106,8 +116,7 @@ const getColumns = (
   {
     field: 'beginDate',
     headerName: 'Starts',
-    disableColumnMenu: true,
-    width: 100,
+    minWidth: 90,
     renderCell: (params: GridRenderCellParams<GridRowData>) => {
       const timestamp = params.value as number | null
 
@@ -127,8 +136,7 @@ const getColumns = (
   {
     field: 'enDate',
     headerName: 'Ends',
-    disableColumnMenu: true,
-    width: 100,
+    minWidth: 90,
     renderCell: (params: GridRenderCellParams<GridRowData>) => {
       const timestamp = params.value as number | null
 
@@ -145,19 +153,19 @@ const getColumns = (
       )
     }
   },
-  { field: 'ClosReason', headerName: 'Reason', disableColumnMenu: true },
+  { field: 'ClosReason', headerName: 'Reason' },
   {
     field: 'DirPRemarks',
     headerName: 'Details',
-    disableColumnMenu: true,
     flex: 1.5,
+    maxWidth: MAX_WIDTHS.DirPRemarks,
     minWidth: 250
   },
   {
     field: 'Remarks',
     headerName: 'Remarks',
-    disableColumnMenu: true,
     flex: 2.75,
+    maxWidth: MAX_WIDTHS.Remarks,
     minWidth: 250
   }
 ]
@@ -208,6 +216,14 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
   const getRowClassName = (params: GridRowClassNameParams<GridRowData>): string =>
     impactedClosureIds.has(params.row.id) ? 'highlighted-row' : ''
 
+  const handleColumnResize = (params: GridColumnResizeParams) => {
+    if (params.colDef.field === 'DirPRemarks' && params.width > MAX_WIDTHS.DirPRemarks) return false
+
+    if (params.colDef.field === 'Remarks' && params.width > MAX_WIDTHS.Remarks) return false
+
+    return true
+  }
+
   const handleIconClick = (event: MouseEvent<HTMLButtonElement>, content: string) => {
     setPopoverAnchorEl(event.currentTarget)
     setPopoverContent(content)
@@ -242,6 +258,7 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
         <Box sx={{ height: gridHeight, width: '100%' }}>
           <DataGrid<GridRowData>
             columns={columns}
+            disableColumnMenu
             disableColumnFilter
             disableColumnSelector
             disableDensitySelector
@@ -253,6 +270,7 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
               pagination: { paginationModel: { pageSize: 100, page: 0 } },
               sorting: { sortModel: [{ field: 'Route', sort: 'asc' }] }
             }}
+            onColumnResize={handleColumnResize}
             pageSizeOptions={[100]}
             rowHeight={72}
             rows={rows}
