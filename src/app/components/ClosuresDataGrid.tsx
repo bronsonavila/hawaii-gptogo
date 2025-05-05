@@ -30,9 +30,8 @@ interface ClosuresDataGridProps {
   analysisResultsMap: Map<number, string>
   closures: ClosureFeature[]
   impactedClosureIds: Set<number>
-  island: string
-  loading: boolean // Loading closures
-  loadingAnalysis: boolean // Loading analysis results
+  isLoadingAnalysis: boolean
+  isLoadingClosures: boolean
   onAnalyzePlan: (drivingPlan: string) => void
   rows: GridRowData[]
 }
@@ -195,9 +194,8 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
   analysisResultsMap,
   closures,
   impactedClosureIds,
-  island,
-  loading,
-  loadingAnalysis,
+  isLoadingAnalysis,
+  isLoadingClosures,
   onAnalyzePlan,
   rows
 }) => {
@@ -236,7 +234,7 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
 
   const columns = getColumns(impactedClosureIds, analysisResultsMap, isTouchDevice, handleIconClick)
 
-  if (loading) {
+  if (isLoadingClosures) {
     return (
       <Box
         sx={{
@@ -303,7 +301,7 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
             }}
             slots={{
               footer: () => (
-                <Footer disabled={closures.length === 0} loading={loadingAnalysis} onAnalyze={onAnalyzePlan} />
+                <Footer disabled={closures.length === 0} loading={isLoadingAnalysis} onAnalyze={onAnalyzePlan} />
               )
             }}
           />

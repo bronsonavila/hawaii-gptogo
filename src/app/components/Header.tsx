@@ -3,14 +3,14 @@ import { SelectChangeEvent } from '@mui/material/Select'
 
 interface HeaderProps {
   island: string
-  loadingAnalysis: boolean
-  loadingClosures: boolean
+  isLoadingAnalysis: boolean
+  isLoadingClosures: boolean
   onIslandChange: (island: string) => void
 }
 
 const ISLAND_OPTIONS = ['Hawaii', 'Kauai', 'Lanai', 'Maui', 'Molokai', 'Oahu']
 
-export const Header: React.FC<HeaderProps> = ({ island, loadingAnalysis, loadingClosures, onIslandChange }) => {
+export const Header: React.FC<HeaderProps> = ({ island, isLoadingAnalysis, isLoadingClosures, onIslandChange }) => {
   return (
     <Typography
       component="h1"
@@ -26,7 +26,7 @@ export const Header: React.FC<HeaderProps> = ({ island, loadingAnalysis, loading
     >
       <Select
         disableUnderline
-        disabled={loadingClosures || loadingAnalysis}
+        disabled={isLoadingClosures || isLoadingAnalysis}
         MenuProps={{ PaperProps: { style: { maxHeight: 48 * 4.5 + 8, width: 250 } } }}
         onChange={(event: SelectChangeEvent<string>) => onIslandChange(event.target.value as string)}
         sx={{

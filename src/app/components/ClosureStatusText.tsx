@@ -5,23 +5,23 @@ import { GridRowData } from './ClosuresDataGrid'
 interface ClosureStatusTextProps {
   closures: ClosureFeature[]
   impactedClosureIds: Set<number>
-  loadingClosures: boolean
+  isLoadingClosures: boolean
+  isShowingAllClosures: boolean
   onShowAllClick: () => void
   rows: GridRowData[]
-  showAllClosures: boolean
 }
 
 export const ClosureStatusText: React.FC<ClosureStatusTextProps> = ({
   closures,
   impactedClosureIds,
-  loadingClosures,
+  isLoadingClosures,
+  isShowingAllClosures,
   onShowAllClick,
-  rows,
-  showAllClosures
+  rows
 }) => {
   return (
     <Typography color="text.secondary" variant="subtitle1" gutterBottom>
-      {loadingClosures ? (
+      {isLoadingClosures ? (
         <Skeleton animation="wave" variant="text" width="320px" />
       ) : (
         <>
@@ -30,7 +30,7 @@ export const ClosureStatusText: React.FC<ClosureStatusTextProps> = ({
             const relevantCount = impactedClosureIds.size
 
             if (relevantCount > 0) {
-              if (showAllClosures) {
+              if (isShowingAllClosures) {
                 return `Showing all ${totalClosures} ${
                   totalClosures === 1 ? 'closure' : 'closures'
                 } (${relevantCount} relevant).`

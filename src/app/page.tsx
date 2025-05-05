@@ -17,11 +17,11 @@ export default function Home() {
   const [closures, setClosures] = useState<ClosureFeature[]>([])
   const [error, setError] = useState<string | null>(null)
   const [island, setIsland] = usePersistentState<string>('island', 'Oahu')
+  const [isLoadingAnalysis, setIsLoadingAnalysis] = useState<boolean>(false)
+  const [isLoadingClosures, setIsLoadingClosures] = useState<boolean>(true)
   const [isMounted, setIsMounted] = useState<boolean>(false)
-  const [loadingAnalysis, setLoadingAnalysis] = useState<boolean>(false)
-  const [loadingClosures, setLoadingClosures] = useState<boolean>(true)
-  const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState<boolean>(false)
-  const [showAllClosures, setShowAllClosures] = useState<boolean>(false)
+  const [isShowingAllClosures, setIsShowingAllClosures] = useState<boolean>(false)
+  const [isSuccessSnackbarOpen, setIsSuccessSnackbarOpen] = useState<boolean>(false)
 
   const analysisResultsMap = useMemo(() => {
     const map = new Map<number, string>()
@@ -57,36 +57,36 @@ export default function Home() {
   const rows: GridRowData[] = useMemo(() => {
     const baseRows = closures.filter(closure => typeof closure.properties.OBJECTID === 'number')
 
-    if (impactedClosureIds.size > 0 && !showAllClosures) {
+    if (impactedClosureIds.size > 0 && !isShowingAllClosures) {
       return baseRows
         .filter(closure => impactedClosureIds.has(closure.properties.OBJECTID as number))
         .map(closure => ({ id: closure.properties.OBJECTID as number, ...closure.properties }))
     }
 
     return baseRows.map(closure => ({ id: closure.properties.OBJECTID as number, ...closure.properties }))
-  }, [closures, impactedClosureIds, showAllClosures])
+  }, [closures, impactedClosureIds, isShowingAllClosures])
 
   const handleCloseSuccessSnackbar = (_?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return
 
-    setOpenSuccessSnackbar(false)
+    setIsSuccessSnackbarOpen(false)
   }
 
   const handleAnalyzePlan = useCallback(
     async (drivingPlan: string) => {
       if (!drivingPlan.trim()) {
         setError('Please enter your driving plan.')
-        setOpenSuccessSnackbar(false)
-        setShowAllClosures(false)
+        setIsSuccessSnackbarOpen(false)
+        setIsShowingAllClosures(false)
 
         return
       }
 
       setAnalysisResults([])
       setError(null)
-      setLoadingAnalysis(true)
-      setOpenSuccessSnackbar(false)
-      setShowAllClosures(false)
+      setIsLoadingAnalysis(true)
+      setIsSuccessSnackbarOpen(false)
+      setIsShowingAllClosures(false)
 
       const planWithDate = `${getFormattedDatePrefix()}${drivingPlan}`
 
@@ -95,15 +95,15 @@ export default function Home() {
 
         setAnalysisResults(results)
 
-        if (results.length === 0) setOpenSuccessSnackbar(true)
+        if (results.length === 0) setIsSuccessSnackbarOpen(true)
       } catch (error: unknown) {
         console.error('Analysis error:', error)
 
         setError(error instanceof Error ? error.message : 'Failed to get analysis. Please try again.')
 
-        setOpenSuccessSnackbar(false)
+        setIsSuccessSnackbarOpen(false)
       } finally {
-        setLoadingAnalysis(false)
+        setIsLoadingAnalysis(false)
       }
     },
     [closureInfoForApi]
@@ -122,9 +122,9 @@ export default function Home() {
       setAnalysisResults([])
       setClosures([])
       setError(null)
-      setLoadingClosures(true)
-      setOpenSuccessSnackbar(false)
-      setShowAllClosures(false)
+      setIsLoadingClosures(true)
+      setIsSuccessSnackbarOpen(false)
+      setIsShowingAllClosures(false)
 
       try {
         const fetchedClosures = await fetchClosures(island)
@@ -135,7 +135,7 @@ export default function Home() {
 
         console.error('Error fetching closures:', error)
       } finally {
-        setLoadingClosures(false)
+        setIsLoadingClosures(false)
       }
     })()
   }, [island, isMounted])
@@ -146,18 +146,18 @@ export default function Home() {
     <Container maxWidth={false} sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 }, pb: { xs: 1, sm: 1.5 } }}>
       <Header
         island={island}
-        loadingAnalysis={loadingAnalysis}
-        loadingClosures={loadingClosures}
+        isLoadingAnalysis={isLoadingAnalysis}
+        isLoadingClosures={isLoadingClosures}
         onIslandChange={setIsland}
       />
 
       <ClosureStatusText
         closures={closures}
         impactedClosureIds={impactedClosureIds}
-        loadingClosures={loadingClosures}
-        onShowAllClick={() => setShowAllClosures(true)}
+        isLoadingClosures={isLoadingClosures}
+        isShowingAllClosures={isShowingAllClosures}
+        onShowAllClick={() => setIsShowingAllClosures(true)}
         rows={rows}
-        showAllClosures={showAllClosures}
       />
 
       {error && (
@@ -170,16 +170,15 @@ export default function Home() {
         analysisResultsMap={analysisResultsMap}
         closures={closures}
         impactedClosureIds={impactedClosureIds}
-        island={island}
-        loading={loadingClosures}
-        loadingAnalysis={loadingAnalysis}
+        isLoadingAnalysis={isLoadingAnalysis}
+        isLoadingClosures={isLoadingClosures}
         onAnalyzePlan={handleAnalyzePlan}
         rows={rows}
       />
 
       <AboutButton />
 
-      <SuccessSnackbar onClose={handleCloseSuccessSnackbar} open={openSuccessSnackbar} />
+      <SuccessSnackbar onClose={handleCloseSuccessSnackbar} open={isSuccessSnackbarOpen} />
     </Container>
   )
 }
