@@ -13,7 +13,9 @@ import { ClosureFeature, ClosureProperties } from '@/api/fetchClosures'
 import { DataGrid, GridColDef, GridRowClassNameParams, GridRenderCellParams } from '@mui/x-data-grid'
 import { Footer } from './Footer'
 import { formatDate } from '@/utils/dateUtils'
+import DarkMode from '@mui/icons-material/DarkMode'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import LightMode from '@mui/icons-material/LightMode'
 import React, { useState, MouseEvent } from 'react'
 
 // Types
@@ -48,6 +50,7 @@ const getColumns = (
     width: 40,
     renderCell: (params: GridRenderCellParams<GridRowData>) => {
       const closureId = params.row.id
+
       if (!impactedClosureIds.has(closureId)) return null
 
       const analysisText = analysisResultsMap.get(closureId) || 'Analysis not available.'
@@ -105,14 +108,42 @@ const getColumns = (
     headerName: 'Starts',
     disableColumnMenu: true,
     width: 100,
-    valueFormatter: (value: number | null) => formatDate(value)
+    renderCell: (params: GridRenderCellParams<GridRowData>) => {
+      const timestamp = params.value as number | null
+
+      if (timestamp === null) return 'N/A'
+
+      const icon = getTimeOfDayIcon(timestamp)
+
+      return (
+        <Box>
+          <Typography variant="body2">{formatDate(timestamp)}</Typography>
+
+          {icon}
+        </Box>
+      )
+    }
   },
   {
     field: 'enDate',
     headerName: 'Ends',
     disableColumnMenu: true,
     width: 100,
-    valueFormatter: (value: number | null) => formatDate(value)
+    renderCell: (params: GridRenderCellParams<GridRowData>) => {
+      const timestamp = params.value as number | null
+
+      if (timestamp === null) return 'N/A'
+
+      const icon = getTimeOfDayIcon(timestamp)
+
+      return (
+        <Box>
+          <Typography variant="body2">{formatDate(timestamp)}</Typography>
+
+          {icon}
+        </Box>
+      )
+    }
   },
   { field: 'ClosReason', headerName: 'Reason', disableColumnMenu: true },
   {
@@ -130,6 +161,25 @@ const getColumns = (
     minWidth: 250
   }
 ]
+
+const getTimeOfDayIcon = (timestamp: number | null): React.ReactNode => {
+  if (timestamp === null) return null
+
+  const date = new Date(timestamp)
+  const hour = date.getHours()
+
+  const isEarlyMorning = hour >= 0 && hour < 6
+  const isDaytime = hour >= 6 && hour < 18
+  const isEvening = hour >= 18
+
+  if (isDaytime) {
+    return <LightMode color="warning" sx={{ fontSize: '1rem', verticalAlign: 'middle' }} />
+  } else if (isEarlyMorning || isEvening) {
+    return <DarkMode color="primary" sx={{ fontSize: '1rem', verticalAlign: 'middle' }} />
+  }
+
+  return null
+}
 
 // Component
 
