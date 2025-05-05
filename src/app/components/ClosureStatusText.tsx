@@ -6,7 +6,7 @@ interface ClosureStatusTextProps {
   impactedClosureIds: Set<number>
   isLoadingClosures: boolean
   isShowingAllClosures: boolean
-  onToggleView: (showAll: boolean) => void
+  onToggleView: (isShowingAll: boolean) => void
 }
 
 export const ClosureStatusText: React.FC<ClosureStatusTextProps> = ({

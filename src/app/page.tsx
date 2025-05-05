@@ -6,6 +6,7 @@ import { analyzeDrivingPlan, ImpactedClosure, ImpactScore } from '@/api/analyzeD
 import { ClosuresDataGrid, GridRowData } from './components/ClosuresDataGrid'
 import { ClosureStatusText } from './components/ClosureStatusText'
 import { fetchClosures, ClosureFeature } from '@/api/fetchClosures'
+import { GridSortModel } from '@mui/x-data-grid'
 import { Header } from './components/Header'
 import { SuccessSnackbar } from './components/SuccessSnackbar'
 import { usePersistentState } from '@/hooks/usePersistentState'
@@ -21,6 +22,7 @@ export default function Home() {
   const [isMounted, setIsMounted] = useState<boolean>(false)
   const [isShowingAllClosures, setIsShowingAllClosures] = useState<boolean>(false)
   const [isSuccessSnackbarOpen, setIsSuccessSnackbarOpen] = useState<boolean>(false)
+  const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'Route', sort: 'asc' }])
 
   const analysisResultsMap = useMemo(() => {
     const map = new Map<number, { analysis: string; impactScore: ImpactScore }>()
@@ -69,7 +71,13 @@ export default function Home() {
 
         setAnalysisResults(results)
 
-        if (results.length === 0) setIsSuccessSnackbarOpen(true)
+        if (results.length > 0) {
+          setSortModel([{ field: 'analysisInfo', sort: 'desc' }])
+        } else {
+          setSortModel([{ field: 'Route', sort: 'asc' }])
+
+          setIsSuccessSnackbarOpen(true)
+        }
       } catch (error: unknown) {
         console.error('Analysis error:', error)
 
@@ -89,7 +97,20 @@ export default function Home() {
     setIsSuccessSnackbarOpen(false)
   }
 
-  const handleToggleView = useCallback((showAll: boolean) => setIsShowingAllClosures(showAll), [])
+  const handleToggleView = useCallback(
+    (isShowingAll: boolean) => {
+      setIsShowingAllClosures(isShowingAll)
+
+      if (isShowingAll) {
+        setSortModel([{ field: 'Route', sort: 'asc' }])
+      } else {
+        impactedClosureIds.size > 0
+          ? setSortModel([{ field: 'analysisInfo', sort: 'desc' }])
+          : setSortModel([{ field: 'Route', sort: 'asc' }])
+      }
+    },
+    [impactedClosureIds.size]
+  )
 
   // Effects
 
@@ -158,7 +179,9 @@ export default function Home() {
         isLoadingAnalysis={isLoadingAnalysis}
         isLoadingClosures={isLoadingClosures}
         onAnalyzePlan={handleAnalyzePlan}
+        onSortModelChange={setSortModel}
         rows={rows}
+        sortModel={sortModel}
       />
 
       <AboutButton />

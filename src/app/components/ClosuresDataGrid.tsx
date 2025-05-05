@@ -16,11 +16,12 @@ import {
   GridColDef,
   GridColumnResizeParams,
   GridRenderCellParams,
-  GridRowClassNameParams
+  GridRowClassNameParams,
+  GridSortModel
 } from '@mui/x-data-grid'
 import { Footer } from './Footer'
 import { formatDate } from '@/utils/dateUtils'
-import { ImpactLevel } from '@/utils/impactUtils'
+import { getImpactColor } from '@/utils/impactUtils'
 import { ImpactScore } from '@/api/analyzeDrivingPlan'
 import DarkMode from '@mui/icons-material/DarkMode'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
@@ -36,7 +37,9 @@ interface ClosuresDataGridProps {
   isLoadingAnalysis: boolean
   isLoadingClosures: boolean
   onAnalyzePlan: (drivingPlan: string) => void
+  onSortModelChange: (model: GridSortModel) => void
   rows: GridRowData[]
+  sortModel: GridSortModel
 }
 
 export type GridRowData = ClosureProperties & { id: number }
@@ -61,8 +64,13 @@ const getColumns = (
     field: 'analysisInfo',
     headerName: '',
     resizable: false,
-    sortable: false,
+    sortable: impactedClosureIds.size > 0,
     width: 40,
+    valueGetter: (_, row: GridRowData) => {
+      const analysisData = analysisResultsMap.get(row.id)
+
+      return analysisData ? analysisData.impactScore.value : -1
+    },
     renderCell: (params: GridRenderCellParams<GridRowData>) => {
       const closureId = params.row.id
 
@@ -73,11 +81,8 @@ const getColumns = (
       if (!analysisData) return null
 
       const { analysis, impactScore } = analysisData
-      const { color, shade } = getImpactColor(impactScore.level)
-
-      const resolvedColor = theme.palette[color][shade]
-
-      const iconProps = { fontSize: 'small' as const, sx: { color: resolvedColor } }
+      const impactColor = getImpactColor(impactScore.level, theme)
+      const iconProps = { fontSize: 'small' as const, sx: { color: impactColor } }
 
       if (isTouchDevice) {
         return (
@@ -98,7 +103,7 @@ const getColumns = (
           title={
             <Box>
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                Impact: <strong style={{ color: resolvedColor }}>{impactScore.level}</strong>
+                Impact: <strong style={{ color: impactColor }}>{impactScore.level}</strong>
               </Typography>
 
               <Typography sx={{ whiteSpace: 'pre-line' }} variant="body2">
@@ -195,21 +200,6 @@ const getColumns = (
   }
 ]
 
-const getImpactColor = (level: string): { color: 'info' | 'success' | 'warning' | 'error'; shade: 'main' | 'dark' } => {
-  switch (level) {
-    case ImpactLevel.Low:
-      return { color: 'info', shade: 'main' }
-    case ImpactLevel.Medium:
-      return { color: 'success', shade: 'main' }
-    case ImpactLevel.High:
-      return { color: 'warning', shade: 'main' }
-    case ImpactLevel.Severe:
-      return { color: 'error', shade: 'main' }
-    default:
-      return { color: 'info', shade: 'main' }
-  }
-}
-
 const getTimeOfDayIcon = (timestamp: number | null): React.ReactNode => {
   if (timestamp === null) return null
 
@@ -239,7 +229,9 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
   isLoadingAnalysis,
   isLoadingClosures,
   onAnalyzePlan,
-  rows
+  onSortModelChange,
+  rows,
+  sortModel
 }) => {
   const [popoverAnchorEl, setPopoverAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [popoverContent, setPopoverContent] = useState<string>('')
@@ -314,9 +306,11 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
               sorting: { sortModel: [{ field: 'Route', sort: 'asc' }] }
             }}
             onColumnResize={handleColumnResize}
+            onSortModelChange={onSortModelChange}
             pageSizeOptions={[100]}
             rowHeight={72}
             rows={rows}
+            sortModel={sortModel}
             sx={{
               '& .MuiDataGrid-footerContainer .MuiBox-root': { borderTop: 'none' },
               '& .MuiDataGrid-footerContainer': { minHeight: 64 },
@@ -366,13 +360,7 @@ export const ClosuresDataGrid: React.FC<ClosuresDataGridProps> = ({
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
               Impact:{' '}
               <strong
-                style={{
-                  color: popoverImpactScore
-                    ? theme.palette[getImpactColor(popoverImpactScore.level).color][
-                        getImpactColor(popoverImpactScore.level).shade
-                      ]
-                    : undefined
-                }}
+                style={{ color: popoverImpactScore ? getImpactColor(popoverImpactScore.level, theme) : undefined }}
               >
                 {popoverImpactScore.level}
               </strong>
