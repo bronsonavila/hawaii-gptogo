@@ -5,6 +5,7 @@ import { Alert, Container } from '@mui/material'
 import { analyzeDrivingPlan, ImpactedClosure, ImpactScore } from '@/api/analyzeDrivingPlan'
 import { ClosuresDataGrid, GridRowData } from './components/ClosuresDataGrid'
 import { ClosureStatusText } from './components/ClosureStatusText'
+import { ErrorSnackbar } from './components/ErrorSnackbar'
 import { fetchClosures, ClosureFeature } from '@/api/fetchClosures'
 import { GridSortModel } from '@mui/x-data-grid'
 import { Header } from './components/Header'
@@ -17,6 +18,7 @@ export default function Home() {
   const [closures, setClosures] = useState<ClosureFeature[]>([])
   const [error, setError] = useState<string | null>(null)
   const [island, setIsland] = usePersistentState<string>('island', 'Oahu')
+  const [isErrorSnackbarOpen, setIsErrorSnackbarOpen] = useState<boolean>(false)
   const [isLoadingAnalysis, setIsLoadingAnalysis] = useState<boolean>(false)
   const [isLoadingClosures, setIsLoadingClosures] = useState<boolean>(true)
   const [isMounted, setIsMounted] = useState<boolean>(false)
@@ -54,17 +56,19 @@ export default function Home() {
     async (drivingPlan: string) => {
       if (!drivingPlan.trim()) {
         setError('Please enter your driving plan.')
-        setIsSuccessSnackbarOpen(false)
+        setIsErrorSnackbarOpen(true)
         setIsShowingAllClosures(false)
+        setIsSuccessSnackbarOpen(false)
 
         return
       }
 
       setAnalysisResults([])
       setError(null)
+      setIsErrorSnackbarOpen(false)
       setIsLoadingAnalysis(true)
-      setIsSuccessSnackbarOpen(false)
       setIsShowingAllClosures(false)
+      setIsSuccessSnackbarOpen(false)
 
       try {
         const results = await analyzeDrivingPlan(closures, drivingPlan)
@@ -82,6 +86,7 @@ export default function Home() {
         console.error('Analysis error:', error)
 
         setError(error instanceof Error ? error.message : 'Failed to get analysis. Please try again.')
+        setIsErrorSnackbarOpen(true)
 
         setIsSuccessSnackbarOpen(false)
       } finally {
@@ -91,11 +96,9 @@ export default function Home() {
     [closures]
   )
 
-  const handleCloseSuccessSnackbar = (_?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') return
+  const handleCloseErrorSnackbar = () => setIsErrorSnackbarOpen(false)
 
-    setIsSuccessSnackbarOpen(false)
-  }
+  const handleCloseSuccessSnackbar = () => setIsSuccessSnackbarOpen(false)
 
   const handleToggleView = useCallback(
     (isShowingAll: boolean) => {
@@ -137,6 +140,7 @@ export default function Home() {
         setClosures(fetchedClosures)
       } catch (error: unknown) {
         setError(error instanceof Error ? error.message : 'An unknown error occurred')
+        setIsErrorSnackbarOpen(true)
 
         console.error('Error fetching closures:', error)
       } finally {
@@ -166,12 +170,6 @@ export default function Home() {
         onToggleView={handleToggleView}
       />
 
-      {error && (
-        <Alert severity="error" sx={{ my: 2 }}>
-          {error}
-        </Alert>
-      )}
-
       <ClosuresDataGrid
         analysisResultsMap={analysisResultsMap}
         closures={closures}
@@ -185,6 +183,8 @@ export default function Home() {
       />
 
       <AboutButton />
+
+      <ErrorSnackbar error={error} onClose={handleCloseErrorSnackbar} open={isErrorSnackbarOpen} />
 
       <SuccessSnackbar onClose={handleCloseSuccessSnackbar} open={isSuccessSnackbarOpen} />
     </Container>

@@ -1,33 +1,25 @@
-import { Alert, Snackbar, useMediaQuery, useTheme } from '@mui/material'
+'use client'
+
+import { Alert } from '@mui/material'
+import { BaseSnackbar } from './BaseSnackbar'
 import React from 'react'
 import TaskAltIcon from '@mui/icons-material/TaskAlt'
 
 interface SuccessSnackbarProps {
-  onClose: (event?: React.SyntheticEvent | Event, reason?: string) => void
+  onClose: () => void
   open: boolean
 }
 
-export const SuccessSnackbar: React.FC<SuccessSnackbarProps> = ({ onClose, open }) => {
-  const theme = useTheme()
-  const isSmUp = useMediaQuery(theme.breakpoints.up('sm'))
-
-  return (
-    <Snackbar
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      autoHideDuration={6000}
+export const SuccessSnackbar: React.FC<SuccessSnackbarProps> = ({ onClose, open }) => (
+  <BaseSnackbar onClose={onClose} open={open}>
+    <Alert
+      icon={<TaskAltIcon fontSize="inherit" />}
       onClose={onClose}
-      open={open}
-      sx={isSmUp ? { bottom: '30px !important', right: '29px !important' } : {}}
+      severity="info"
+      sx={{ color: 'text.primary', width: '100%' }}
+      variant="filled"
     >
-      <Alert
-        icon={<TaskAltIcon fontSize="inherit" />}
-        onClose={onClose}
-        severity="info"
-        sx={{ color: 'text.primary', width: '100%' }}
-        variant="filled"
-      >
-        Your driving plan is clear of known closures.
-      </Alert>
-    </Snackbar>
-  )
-}
+      Your driving plan is clear of known closures.
+    </Alert>
+  </BaseSnackbar>
+)
