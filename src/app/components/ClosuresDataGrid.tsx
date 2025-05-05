@@ -46,26 +46,6 @@ const getColumns = (
     filterable: false,
     sortable: false,
     width: 40,
-    renderHeader: () =>
-      impactedClosureIds.size > 0 ? (
-        <Box
-          sx={{
-            backgroundColor: theme => theme.palette.info.light,
-            borderRadius: '10px',
-            color: theme => theme.palette.info.contrastText,
-            display: 'inline-block',
-            fontSize: '0.75rem',
-            fontWeight: 'bold',
-            lineHeight: 1,
-            margin: '0 auto',
-            padding: '3px 6px'
-          }}
-        >
-          {Math.min(impactedClosureIds.size, 99)}
-
-          {impactedClosureIds.size > 99 && '+'}
-        </Box>
-      ) : null,
     renderCell: (params: GridRenderCellParams<GridRowData>) => {
       const closureId = params.row.id
       if (!impactedClosureIds.has(closureId)) return null
