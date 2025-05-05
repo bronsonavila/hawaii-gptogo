@@ -1,6 +1,7 @@
 'use client'
 
 import { AboutButton } from './components/AboutButton'
+import { AnalysisPendingEffect } from './components/AnalysisPendingEffect'
 import { analyzeDrivingPlan, ImpactedClosure, ImpactScore } from '@/api/analyzeDrivingPlan'
 import { ClosuresDataGrid, GridRowData } from './components/ClosuresDataGrid'
 import { ClosureStatusText } from './components/ClosureStatusText'
@@ -156,6 +157,8 @@ export default function Home() {
 
   return (
     <Container maxWidth={false} sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 }, pb: { xs: 1, sm: 1.5 } }}>
+      <AnalysisPendingEffect isVisible={isLoadingAnalysis} />
+
       <Header
         island={island}
         isLoadingAnalysis={isLoadingAnalysis}
