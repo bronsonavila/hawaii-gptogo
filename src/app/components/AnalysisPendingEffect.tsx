@@ -5,6 +5,7 @@ import { type ISourceOptions } from '@tsparticles/engine'
 import { useEffect, useMemo, useState } from 'react'
 import { useTheme } from '@mui/material/styles'
 import Particles, { initParticlesEngine } from '@tsparticles/react'
+import useMediaQuery from '@mui/material/useMediaQuery'
 
 interface AnalysisPendingEffectProps {
   isVisible: boolean
@@ -13,6 +14,7 @@ interface AnalysisPendingEffectProps {
 export const AnalysisPendingEffect = ({ isVisible }: AnalysisPendingEffectProps) => {
   const [init, setInit] = useState(false)
   const theme = useTheme()
+  const isSmUp = useMediaQuery(theme.breakpoints.up('sm'))
 
   const options: ISourceOptions = useMemo(() => {
     const lowColor = getImpactColor(ImpactLevel.Low, theme)
@@ -112,7 +114,7 @@ export const AnalysisPendingEffect = ({ isVisible }: AnalysisPendingEffectProps)
 
   if (init) {
     return (
-      <Fade in={isVisible} timeout={1500}>
+      <Fade in={isVisible && isSmUp} timeout={1500}>
         <div>
           <Particles id="tsparticles" options={options} />
         </div>
