@@ -51,6 +51,14 @@ export const AboutButton = () => {
               For the most accurate analysis, please include specific details such as route numbers, direction, and key
               locations (e.g., exit numbers, intersections, etc.).
             </Typography>
+
+            <Typography variant="body2">
+              The AI analysis is powered by{' '}
+              <Link href="https://deepmind.google/technologies/gemini/pro/" rel="noopener noreferrer" target="_blank">
+                Gemini 2.5 Pro
+              </Link>
+              , one of the leading reasoning models. Please note that generating the analysis may take 1-2 minutes.
+            </Typography>
           </Stack>
 
           <Divider sx={{ my: 2.5 }} />
