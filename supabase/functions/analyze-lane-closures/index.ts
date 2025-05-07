@@ -1,6 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 // @ts-ignore
-import { GoogleGenerativeAI } from 'npm:@google/generative-ai@0.24.0'
+import { GoogleGenerativeAI, SchemaType } from 'npm:@google/generative-ai@0.24.0'
 
 // Types
 
@@ -39,27 +39,27 @@ interface ErrorResponse {
 
 // Constants
 
-const AI_MODEL = 'gemini-2.5-pro-preview-03-25'
+const AI_MODEL = 'gemini-2.5-pro-preview-05-06'
 
 const AI_SCHEMA = {
-  type: 'array',
+  type: SchemaType.ARRAY,
   items: {
-    type: 'object',
+    type: SchemaType.OBJECT,
     properties: {
-      id: { type: 'number', description: "The id of the lane closure that impacts the user's driving plan" },
+      id: { type: SchemaType.NUMBER, description: "The id of the lane closure that impacts the user's driving plan" },
       analysis: {
-        type: 'string',
+        type: SchemaType.STRING,
         description: "Detailed analysis of how this specific lane closure affects the user's driving plan"
       },
       impactScore: {
-        type: 'object',
+        type: SchemaType.OBJECT,
         properties: {
           level: {
-            type: 'string',
+            type: SchemaType.STRING,
             description: "A descriptive label for the impact level ('Low', 'Medium', 'High', 'Severe')"
           },
           value: {
-            type: 'number',
+            type: SchemaType.NUMBER,
             description: 'Numeric value representing the impact score (1 = Low, 2 = Medium, 3 = High, 4 = Severe)'
           }
         },
