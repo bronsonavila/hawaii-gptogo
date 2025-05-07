@@ -64,6 +64,8 @@ export default function Home() {
         return
       }
 
+      if (sortModel[0]?.field === 'analysisInfo') setSortModel([{ field: 'Route', sort: 'asc' }])
+
       setAnalysisResults([])
       setError(null)
       setIsErrorSnackbarOpen(false)
@@ -79,8 +81,6 @@ export default function Home() {
         if (results.length > 0) {
           setSortModel([{ field: 'analysisInfo', sort: 'desc' }])
         } else {
-          setSortModel([{ field: 'Route', sort: 'asc' }])
-
           setIsSuccessSnackbarOpen(true)
         }
       } catch (error: unknown) {
@@ -94,7 +94,7 @@ export default function Home() {
         setIsLoadingAnalysis(false)
       }
     },
-    [closures]
+    [closures, sortModel]
   )
 
   const handleCloseErrorSnackbar = () => setIsErrorSnackbarOpen(false)
