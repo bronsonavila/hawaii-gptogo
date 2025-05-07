@@ -86,7 +86,7 @@ export default function Home() {
       } catch (error: unknown) {
         console.error('Analysis error:', error)
 
-        setError(error instanceof Error ? error.message : 'Failed to get analysis. Please try again.')
+        setError('AI service unavailable. Please try again later.')
         setIsErrorSnackbarOpen(true)
 
         setIsSuccessSnackbarOpen(false)
