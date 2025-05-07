@@ -115,8 +115,9 @@ const getColumns = (
           <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
             <IconButton
               aria-label="Show analysis tooltip"
+              disableRipple
               size="small"
-              sx={{ p: 0.5, cursor: 'pointer' }}
+              sx={{ cursor: 'help', p: 0.5 }}
               tabIndex={-1}
             >
               <InfoOutlinedIcon fontSize={iconProps.fontSize} sx={iconProps.sx} />
