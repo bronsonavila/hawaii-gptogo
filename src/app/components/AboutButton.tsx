@@ -54,10 +54,11 @@ export const AboutButton = () => {
 
             <Typography variant="body2">
               The AI analysis is powered by{' '}
-              <Link href="https://deepmind.google/technologies/gemini/pro/" rel="noopener noreferrer" target="_blank">
-                Gemini 2.5 Pro
+              <Link href="https://deepmind.google/technologies/gemini/" rel="noopener noreferrer" target="_blank">
+                Google Gemini
               </Link>
-              , one of the leading reasoning models. Please note that generating the analysis may take 1-2 minutes.
+              . This is an experimental technology that may be unreliable or unavailable. Generating the analysis may
+              take 1-2 minutes.
             </Typography>
           </Stack>
 
