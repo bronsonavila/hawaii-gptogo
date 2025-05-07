@@ -6,12 +6,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTheme } from '@mui/material/styles'
 import Particles, { initParticlesEngine } from '@tsparticles/react'
 import useMediaQuery from '@mui/material/useMediaQuery'
+import React from 'react'
 
 interface AnalysisPendingEffectProps {
   isVisible: boolean
 }
 
-export const AnalysisPendingEffect = ({ isVisible }: AnalysisPendingEffectProps) => {
+// Memoize to prevent re-renders caused by parent state changes (e.g., `sortModel` in <Home>).
+export const AnalysisPendingEffect = React.memo(({ isVisible }: AnalysisPendingEffectProps) => {
   const [init, setInit] = useState(false)
   const theme = useTheme()
   const isSmUp = useMediaQuery(theme.breakpoints.up('sm'))
@@ -104,4 +106,6 @@ export const AnalysisPendingEffect = ({ isVisible }: AnalysisPendingEffectProps)
   }
 
   return null
-}
+})
+
+AnalysisPendingEffect.displayName = 'AnalysisPendingEffect'
