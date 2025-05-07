@@ -5,7 +5,7 @@ import './globals.css'
 export const metadata: Metadata = {
   description:
     'A web application designed to fetch, display, and analyze lane closure information for the state of Hawaii.',
-  title: 'GPToGo - AI Lane Closure Analysis'
+  title: 'Hawaii GPToGo - AI Lane Closure Analysis'
 }
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {

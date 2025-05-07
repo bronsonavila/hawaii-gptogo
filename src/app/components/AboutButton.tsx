@@ -67,7 +67,7 @@ export const AboutButton = () => {
           <Stack spacing={1.5}>
             <Typography variant="body2">
               Created by:{' '}
-              <Link href="https://github.com/bronsonavila/gptogo" rel="noopener noreferrer" target="_blank">
+              <Link href="https://github.com/bronsonavila/hawaii-gptogo" rel="noopener noreferrer" target="_blank">
                 Bronson Avila
               </Link>
             </Typography>

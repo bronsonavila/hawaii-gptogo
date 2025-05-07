@@ -1,12 +1,12 @@
-# GPToGo - AI Lane Closure Analysis
+# Hawaii GPToGo - AI Lane Closure Analysis
 
 A web application designed to fetch, display, and analyze lane closure information in the state of Hawaii.
 
-[Live site](https://bronsonavila.github.io/gptogo/)
+[Live site](https://bronsonavila.github.io/hawaii-gptogo/)
 
 ## Overview
 
-GPToGo provides near real-time lane closure data sourced from the Hawaii Department of Transportation's [Lane Closure Public Access](https://hidot.hawaii.gov/highways/roadwork/) ArcGIS API.
+Hawaii GPToGo provides near real-time lane closure data sourced from the Hawaii Department of Transportation's [Lane Closure Public Access](https://hidot.hawaii.gov/highways/roadwork/) ArcGIS API.
 
 Users can input their driving plan and receive an AI-generated analysis highlighting which closures might impact their route.
 
