@@ -105,6 +105,8 @@ Review the driving plan and the list of active lane closures. For each lane clos
 
 Assume the driving plan is for a one-way trip unless the user explicitly mentions a return trip.
 
+When evaluating lane closures, if there are conflicting directions or other information between fields, prioritize them in this order: Route > From/To > Details > Remarks.
+
 Only include closures that are likely to directly impact the user's plan based on the routes, locations, and timing mentioned. If a closure is not relevant to their plan, do not include it in the response.
 
 For each impacted closure, include:
