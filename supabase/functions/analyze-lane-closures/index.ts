@@ -108,8 +108,8 @@ Assume the driving plan is for a one-way trip unless the user explicitly mention
 Only include closures that are likely to directly impact the user's plan based on the routes, locations, and timing mentioned. If a closure is not relevant to their plan, do not include it in the response.
 
 For each impacted closure, include:
-1. The closure's id
-2. A detailed analysis of how it might affect the user's drive
+1. The closure's id (IMPORTANT: Include this in the structured data response ONLY - do NOT mention closure IDs in the analysis text)
+2. A detailed analysis of how it might affect the user's drive (without mentioning the closure's id)
 3. An impact score with the following criteria:
    - Level: One of ['Low', 'Medium', 'High', 'Severe']
    - Value: Corresponding numeric value (1 = Low, 2 = Medium, 3 = High, 4 = Severe)
