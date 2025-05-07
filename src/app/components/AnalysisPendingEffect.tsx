@@ -23,8 +23,8 @@ export const AnalysisPendingEffect = ({ isVisible }: AnalysisPendingEffectProps)
     const severeColor = getImpactColor(ImpactLevel.Severe, theme)
 
     const weightedColors = [
-      ...Array(4).fill(lowColor),
-      ...Array(3).fill(mediumColor),
+      ...Array(8).fill(lowColor),
+      ...Array(4).fill(mediumColor),
       ...Array(2).fill(highColor),
       ...Array(1).fill(severeColor)
     ]
@@ -36,27 +36,6 @@ export const AnalysisPendingEffect = ({ isVisible }: AnalysisPendingEffectProps)
         }
       },
       fpsLimit: 60,
-      interactivity: {
-        events: {
-          onClick: {
-            enable: false,
-            mode: 'push'
-          },
-          onHover: {
-            enable: false,
-            mode: 'repulse'
-          }
-        },
-        modes: {
-          push: {
-            quantity: 4
-          },
-          repulse: {
-            distance: 25,
-            duration: 0.4
-          }
-        }
-      },
       particles: {
         color: {
           value: weightedColors
@@ -75,14 +54,14 @@ export const AnalysisPendingEffect = ({ isVisible }: AnalysisPendingEffectProps)
             default: 'bounce'
           },
           random: true,
-          speed: { min: 0.1, max: 1 },
+          speed: { min: 0.1, max: 0.8 },
           straight: false
         },
         number: {
           density: {
             enable: true
           },
-          value: 80
+          value: 120
         },
         opacity: {
           value: { min: 0.1, max: 0.4 },
@@ -92,7 +71,7 @@ export const AnalysisPendingEffect = ({ isVisible }: AnalysisPendingEffectProps)
           type: 'circle'
         },
         size: {
-          value: { min: 1, max: 4 },
+          value: { min: 1, max: 3 },
           random: true
         }
       },
@@ -112,9 +91,11 @@ export const AnalysisPendingEffect = ({ isVisible }: AnalysisPendingEffectProps)
     })
   }, [])
 
+  if (!isVisible) return null
+
   if (init) {
     return (
-      <Fade in={isVisible && isSmUp} timeout={1500}>
+      <Fade in={isSmUp} timeout={2000}>
         <div>
           <Particles id="tsparticles" options={options} />
         </div>
