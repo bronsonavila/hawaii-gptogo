@@ -1,6 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 // @ts-ignore
-import { GoogleGenerativeAI, SchemaType } from 'npm:@google/generative-ai@0.24.0'
+import { GoogleGenAI, Type } from 'npm:@google/genai@0.13.0'
 
 // Types
 
@@ -42,24 +42,24 @@ interface ErrorResponse {
 const AI_MODEL = 'gemini-2.5-pro-preview-05-06'
 
 const AI_SCHEMA = {
-  type: SchemaType.ARRAY,
+  type: Type.ARRAY,
   items: {
-    type: SchemaType.OBJECT,
+    type: Type.OBJECT,
     properties: {
-      id: { type: SchemaType.NUMBER, description: "The id of the lane closure that impacts the user's driving plan" },
+      id: { type: Type.NUMBER, description: "The id of the lane closure that impacts the user's driving plan" },
       analysis: {
-        type: SchemaType.STRING,
+        type: Type.STRING,
         description: "Detailed analysis of how this specific lane closure affects the user's driving plan"
       },
       impactScore: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
           level: {
-            type: SchemaType.STRING,
+            type: Type.STRING,
             description: "A descriptive label for the impact level ('Low', 'Medium', 'High', 'Severe')"
           },
           value: {
-            type: SchemaType.NUMBER,
+            type: Type.NUMBER,
             description: 'Numeric value representing the impact score (1 = Low, 2 = Medium, 3 = High, 4 = Severe)'
           }
         },
@@ -71,41 +71,7 @@ const AI_SCHEMA = {
   }
 }
 
-// @ts-ignore
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
-
-const ALLOWED_ORIGINS = [
-  'http://localhost:3000',
-  'https://bronsonavila.github.io',
-  'https://gptogo.app',
-  'https://www.gptogo.app'
-]
-
-// Functions
-
-function getCorsHeaders(origin: string | null): Record<string, string> {
-  const isAllowed = origin && ALLOWED_ORIGINS.includes(origin)
-
-  return {
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Origin': isAllowed ? origin : ALLOWED_ORIGINS[0]
-  }
-}
-
-function buildAiPrompt(closures: ClosureInfo[], drivingPlan: string): string {
-  return `
-Analyze the following lane closure information in the context of the user's driving plan.
-
-**Lane Closures:**
-\`\`\`json
-${JSON.stringify(closures, null, 2)}
-\`\`\`
-
-**User's Driving Plan:**
-"${drivingPlan}"
-
-**Task:**
+const AI_SYSTEM_INSTRUCTION = `
 Review the driving plan and the list of active lane closures. For each lane closure that directly and significantly impacts the driving plan, provide an analysis explaining how and why it could affect the user. Address the analysis directly to the user (using "you" and "your").
 
 Assume the driving plan is for a one-way trip unless the user explicitly mentions a return trip.
@@ -140,6 +106,41 @@ The impact score should consider the following factors, using information from a
 4.  **Predictability & Mitigation:**
     *   Is the closure roving/mobile? (Check \`Details\`/\`Remarks\` for 'Roving'). These increase uncertainty and potential impact area.
     *   Alternative Route Availability: Are easy detours explicitly mentioned or obviously available?
+`
+
+const ALLOWED_ORIGINS = [
+  'http://localhost:3000',
+  'https://bronsonavila.github.io',
+  'https://gptogo.app',
+  'https://www.gptogo.app'
+]
+
+// @ts-ignore
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
+
+// Functions
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const isAllowed = origin && ALLOWED_ORIGINS.includes(origin)
+
+  return {
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Origin': isAllowed ? origin : ALLOWED_ORIGINS[0]
+  }
+}
+
+function setPromptContents(closures: ClosureInfo[], drivingPlan: string): string {
+  return `
+Analyze the following lane closure information in the context of the user's driving plan.
+
+**Lane Closures:**
+\`\`\`json
+${JSON.stringify(closures, null, 2)}
+\`\`\`
+
+**User's Driving Plan:**
+"${drivingPlan}"
 `
 }
 
@@ -206,18 +207,24 @@ Deno.serve(async (req: Request) => {
 
   // AI Interaction
   try {
-    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
+    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY })
 
-    const model = genAI.getGenerativeModel({
-      model: AI_MODEL,
-      generationConfig: { responseMimeType: 'application/json', responseSchema: AI_SCHEMA, temperature: 0 }
-    })
+    const config = {
+      responseMimeType: 'application/json',
+      responseSchema: AI_SCHEMA,
+      systemInstruction: AI_SYSTEM_INSTRUCTION,
+      temperature: 0
+    }
 
-    const prompt = buildAiPrompt(closures, drivingPlan)
+    const contents = setPromptContents(closures, drivingPlan)
 
-    const { response } = await model.generateContent([prompt])
+    const { text, usageMetadata } = await ai.models.generateContent({ config, contents, model: AI_MODEL })
 
-    const impactedClosures = JSON.parse(response.text())
+    const { candidatesTokenCount, promptTokenCount, thoughtsTokenCount, totalTokenCount } = usageMetadata
+
+    console.log({ candidatesTokenCount, promptTokenCount, thoughtsTokenCount, totalTokenCount })
+
+    const impactedClosures = JSON.parse(text)
 
     const successResponse: AnalysisResponse = { impactedClosures }
 
