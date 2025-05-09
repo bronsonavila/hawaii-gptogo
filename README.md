@@ -2,7 +2,7 @@
 
 A web application designed to fetch, display, and analyze lane closure information in the state of Hawaii.
 
-[Live site](https://bronsonavila.github.io/hawaii-gptogo/)
+[Live site](https://gptogo.app/)
 
 ## Overview
 

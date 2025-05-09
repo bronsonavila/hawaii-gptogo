@@ -74,7 +74,12 @@ const AI_SCHEMA = {
 // @ts-ignore
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
 
-const ALLOWED_ORIGINS = ['http://localhost:3000', 'https://bronsonavila.github.io']
+const ALLOWED_ORIGINS = [
+  'http://localhost:3000',
+  'https://bronsonavila.github.io',
+  'https://gptogo.app',
+  'https://www.gptogo.app'
+]
 
 // Functions
 
