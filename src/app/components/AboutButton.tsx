@@ -48,11 +48,6 @@ export const AboutButton = () => {
             </Typography>
 
             <Typography variant="body2">
-              For the most accurate analysis, please include details such as route numbers, direction, and key locations
-              (e.g., specific highways, exit numbers, etc.)
-            </Typography>
-
-            <Typography variant="body2">
               The AI analysis is powered by{' '}
               <Link href="https://deepmind.google/technologies/gemini/" rel="noopener noreferrer" target="_blank">
                 Google Gemini
