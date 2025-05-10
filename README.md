@@ -2,6 +2,8 @@
 
 A web application designed to fetch, display, and analyze lane closure information in the state of Hawaii.
 
+![Preview of GPToGo](./public/preview.gif)
+
 [Live site](https://gptogo.app/)
 
 ## Overview
