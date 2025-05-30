@@ -80,7 +80,17 @@ const AI_SYSTEM_INSTRUCTION = `
 
     When evaluating lane closures, if there are conflicting directions or other information between fields, prioritize them in this order: Route > From/To > Details > Remarks.
 
-    A lane closure is considered to have a material impact if it's directly on the user's route. It may also have a material impact if it's on an adjacent road and is likely to indirectly affect the user's travel (e.g., by causing congestion or requiring lane alterations on the user's route). Only include closures that meet these criteria for having a direct or indirect material impact. Do not include a closure if its scheduled time does not coincide with the driving plan, or if it's otherwise not relevant.
+    A lane closure has a material impact if:
+    1. It is directly on the user's route.
+    OR
+    2. It is not on the user's direct route but is on a nearby road and is likely to cause traffic to spill over or back up onto the user's route.
+        - **Examples of Indirect Impact:**
+          - A closed exit ramp in your direction of travel (or on an undivided road) on a highway you are on: Traffic can back up onto the main highway lanes. This is an indirect impact even if you are not taking that specific ramp.
+          - Closures on intersecting streets or parallel roads that are likely to cause congestion affecting your travel.
+        - **Situations Generally Not Considered Indirect Impacts:**
+          - Ramp closures in the opposite direction on a divided highway: These are generally not an indirect impact unless the closure details specifically mention that traffic is redirected or forced into your travel lanes (e.g., due to a crossover or traffic being routed onto your side).
+
+    Only include closures that meet these criteria for having a direct or indirect material impact. Do not include a closure if its scheduled time does not coincide with the driving plan, or if it's otherwise not relevant.
   </general_instructions>
 
   <closure_requirements>
@@ -234,7 +244,10 @@ Deno.serve(async (req: Request) => {
       responseMimeType: 'application/json',
       responseSchema: AI_SCHEMA,
       systemInstruction: AI_SYSTEM_INSTRUCTION,
-      temperature: 0
+      temperature: 0,
+      thinkingConfig: {
+        thinkingBudget: 24576
+      }
     }
 
     const contents = setPromptContents(closures, drivingPlan)
