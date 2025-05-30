@@ -53,7 +53,7 @@ export const AboutButton = () => {
                 Google Gemini
               </Link>
               . This is an experimental technology that may be unreliable or unavailable. Generating the analysis may
-              take 1-2 minutes.
+              take 30 seconds to 1 minute.
             </Typography>
           </Stack>
 
